@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"time"
 	"wp/wp"
 )
 
 func main() {
 	//executorService := NewExecutorService()
-	//futures := make([]*Future, 0)
+	futures := make([]*wp.Future, 0)
 	//
 	//for i := 0; i < 1235; i++ {
 	//	f, err := executorService.Submit(s)
@@ -23,12 +24,20 @@ func main() {
 	fmt.Println("Hello World")
 
 	executorService := wp.NewExecutorService()
-	f, _ := executorService.Submit(s)
-	fmt.Println(f.Result())
+	workerPool := executorService.NewFixedWorkerPool(1)
+	for i := 0; i < 30; i++ {
+		f, _ := workerPool.Submit(s)
+		futures = append(futures, f)
+	}
+	for i := 0; i < 20; i++ {
+		fmt.Println(i, futures[i].Result())
+	}
+
+	time.Sleep(1 * time.Minute)
 }
 
 func s() int {
-	//time.Sleep(2000 * time.Millisecond)
+	time.Sleep(2000 * time.Millisecond)
 	return 63
 }
 
