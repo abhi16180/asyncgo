@@ -17,7 +17,6 @@ func NewWorker(ctx context.Context, wg *sync.WaitGroup, tasks <-chan Task, id in
 	defer wg.Done()
 	log.Println("New worker started")
 	for {
-		fmt.Println(len(tasks))
 		select {
 		case task := <-tasks:
 			log.Println(fmt.Sprintf("Worker %d received task", id))
@@ -28,7 +27,7 @@ func NewWorker(ctx context.Context, wg *sync.WaitGroup, tasks <-chan Task, id in
 			log.Println("Worker", id, "exiting - context canceled")
 			return
 		default:
-			fmt.Println(fmt.Sprintf("Buffer is full waiting for current tasks to complete"))
+			fmt.Println(fmt.Sprintf("Worker %d received all tasks", id))
 		}
 	}
 }
