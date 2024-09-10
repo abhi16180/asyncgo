@@ -6,6 +6,10 @@ import (
 	"wp"
 )
 
+type S struct {
+	V int
+}
+
 func main() {
 	//executorService := NewExecutorService()
 	futures := make([]*wp.Future, 0)
@@ -29,14 +33,21 @@ func main() {
 		f, _ := workerPool.Submit(s)
 		futures = append(futures, f)
 	}
+	//for i := 0; i < 1; i++ {
+	//	fmt.Println(i, futures[i].GetResult())
+	//}
+
 	for i := 0; i < 1; i++ {
-		fmt.Println(i, futures[i].Result())
+		fmt.Println(i, futures[i].GetResult())
 	}
+
 }
 
-func s() int {
+func s() S {
 	time.Sleep(2000 * time.Millisecond)
-	return 63
+	return S{
+		V: 1,
+	}
 }
 
 //type ExecutorService struct {

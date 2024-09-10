@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// TODO remove hardcoded vals
 var channelBuffer = 20
 
 type TaskQueue interface {

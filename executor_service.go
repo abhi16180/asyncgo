@@ -7,6 +7,7 @@ import (
 	"sync"
 )
 
+// TODO add more funcs
 var wg sync.WaitGroup
 var mutex sync.Mutex
 
@@ -75,8 +76,8 @@ func NewWorkerPool(executor ExecutorService, taskChan chan Task, wg *sync.WaitGr
 	}
 }
 
-// Submit Creates new task from function and adds to task queue. Will be eventually processed by the worker(s)
-// This does not execute the function instantaneously. For instantaneous execution, use ExecutorService.Submit
+// Submit Creates new task from function and adds to task queue. This does not execute the function instantaneously.
+// Will be eventually processed by the worker(s). For instantaneous execution, use ExecutorService.Submit
 // instead
 func (w *WorkerPool) Submit(function interface{}, args ...interface{}) (*Future, error) {
 	resultChan := make(chan []interface{})

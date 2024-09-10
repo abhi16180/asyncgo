@@ -2,6 +2,7 @@ package wp
 
 import (
 	"reflect"
+	"wp/utils"
 )
 
 type Task interface {
@@ -28,20 +29,12 @@ func (t *TaskImpl) Execute() error {
 	for i, arg := range t.args {
 		argSlice[i] = reflect.ValueOf(arg)
 	}
+	var result []reflect.Value
 	if len(argSlice) > 0 {
-		result := val.Call(argSlice)
-		resultInterface := make([]interface{}, 0)
-		for _, item := range result {
-			resultInterface = append(resultInterface, item.Interface())
-		}
-		t.resultChannel <- resultInterface
-		return nil
+		result = val.Call(argSlice)
+	} else {
+		result = val.Call([]reflect.Value{})
 	}
-	result := val.Call([]reflect.Value{})
-	resultInterface := make([]interface{}, 0)
-	for _, item := range result {
-		resultInterface = append(resultInterface, item.Interface())
-	}
-	t.resultChannel <- resultInterface
+	t.resultChannel <- utils.GetResultInterface(result)
 	return nil
 }
