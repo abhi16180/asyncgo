@@ -23,7 +23,7 @@ type ExecutorServiceImpl struct {
 // Submit Spawns new goroutine everytime this function is called.
 // If you have large number of tasks use NewFixedWorkerPool instead
 func (e *ExecutorServiceImpl) Submit(function interface{}, args ...interface{}) (*Future, error) {
-	resultChan := make(chan interface{})
+	resultChan := make(chan []interface{})
 	task := NewTask(resultChan, function, args)
 	go func() {
 		err := task.Execute()
@@ -34,11 +34,12 @@ func (e *ExecutorServiceImpl) Submit(function interface{}, args ...interface{}) 
 	return NewFuture(resultChan), nil
 }
 
+// pushToQueue Adds task to task queue associated with the worker pool
 func (t *ExecutorServiceImpl) pushToQueue(task *Task) {
 	t.taskQueue.PushToQueue(task)
 }
 
-// NewFixedWorkerPool WIP
+// NewFixedWorkerPool Creates pool of workers with N go-routines. Spawns separate go-routine for queue processor
 func (e *ExecutorServiceImpl) NewFixedWorkerPool(workers int64) WorkerPool {
 	ctx, cancel := context.WithCancel(context.Background())
 	taskChan := make(chan Task, 20)
@@ -74,10 +75,12 @@ func NewWorkerPool(executor ExecutorService, taskChan chan Task, wg *sync.WaitGr
 	}
 }
 
+// Submit Creates new task from function and adds to task queue. Will be eventually processed by the worker(s)
+// This does not execute the function instantaneously. For instantaneous execution, use ExecutorService.Submit
+// instead
 func (w *WorkerPool) Submit(function interface{}, args ...interface{}) (*Future, error) {
-	resultChan := make(chan interface{})
+	resultChan := make(chan []interface{})
 	task := NewTask(resultChan, function, args)
-	fmt.Println(fmt.Sprintf("ExecutorService.Submit: submit task: %v", task))
 	w.executor.pushToQueue(&task)
 	return NewFuture(resultChan), nil
 }

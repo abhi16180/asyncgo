@@ -32,8 +32,3 @@ func NewWorker(ctx context.Context, wg *sync.WaitGroup, tasks <-chan Task, id in
 		}
 	}
 }
-
-/// create a task with result channel
-/// pass the task as channel
-/// listen to task changes
-/// execute tasks

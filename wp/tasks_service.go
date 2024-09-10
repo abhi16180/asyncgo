@@ -1,18 +1,20 @@
 package wp
 
-import "reflect"
+import (
+	"reflect"
+)
 
 type Task interface {
 	Execute() error
 }
 
 type TaskImpl struct {
-	resultChannel chan<- interface{}
+	resultChannel chan<- []interface{}
 	function      interface{}
 	args          []interface{}
 }
 
-func NewTask(resultChan chan<- interface{}, function interface{}, args []interface{}) Task {
+func NewTask(resultChan chan<- []interface{}, function interface{}, args []interface{}) Task {
 	return &TaskImpl{
 		resultChannel: resultChan,
 		function:      function,
@@ -28,9 +30,18 @@ func (t *TaskImpl) Execute() error {
 	}
 	if len(argSlice) > 0 {
 		result := val.Call(argSlice)
-		t.resultChannel <- result
+		resultInterface := make([]interface{}, 0)
+		for _, item := range result {
+			resultInterface = append(resultInterface, item.Interface())
+		}
+		t.resultChannel <- resultInterface
 		return nil
 	}
-	t.resultChannel <- val.Call([]reflect.Value{})
+	result := val.Call([]reflect.Value{})
+	resultInterface := make([]interface{}, 0)
+	for _, item := range result {
+		resultInterface = append(resultInterface, item.Interface())
+	}
+	t.resultChannel <- resultInterface
 	return nil
 }

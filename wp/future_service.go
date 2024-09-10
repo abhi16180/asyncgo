@@ -1,10 +1,10 @@
 package wp
 
 type Future struct {
-	result <-chan interface{}
+	result <-chan []interface{}
 }
 
-func NewFuture(resultChannel <-chan interface{}) *Future {
+func NewFuture(resultChannel <-chan []interface{}) *Future {
 	return &Future{
 		result: resultChannel,
 	}
