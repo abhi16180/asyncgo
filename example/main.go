@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"time"
-	"wp/wp"
+	"wp"
 )
 
 func main() {
