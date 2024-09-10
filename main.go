@@ -24,16 +24,14 @@ func main() {
 	fmt.Println("Hello World")
 
 	executorService := wp.NewExecutorService()
-	workerPool := executorService.NewFixedWorkerPool(1)
-	for i := 0; i < 30; i++ {
+	workerPool := executorService.NewFixedWorkerPool(10)
+	for i := 0; i < 100; i++ {
 		f, _ := workerPool.Submit(s)
 		futures = append(futures, f)
 	}
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 100; i++ {
 		fmt.Println(i, futures[i].Result())
 	}
-
-	time.Sleep(1 * time.Minute)
 }
 
 func s() int {

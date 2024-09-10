@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 )
 
 type Worker interface {
@@ -27,7 +28,7 @@ func NewWorker(ctx context.Context, wg *sync.WaitGroup, tasks <-chan Task, id in
 			log.Println("Worker", id, "exiting - context canceled")
 			return
 		default:
-			fmt.Println(fmt.Sprintf("Worker %d received all tasks", id))
+			time.Sleep(1 * time.Second)
 		}
 	}
 }
