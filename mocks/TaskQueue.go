@@ -33,9 +33,9 @@ func (_m *TaskQueue) PopTask() *wp.Task {
 	return r0
 }
 
-// ProcessQueue provides a mock function with given fields: taskChannel
-func (_m *TaskQueue) ProcessQueue(taskChannel chan<- wp.Task) {
-	_m.Called(taskChannel)
+// ProcessQueue provides a mock function with given fields: options, taskChannel
+func (_m *TaskQueue) ProcessQueue(options *wp.Options, taskChannel chan<- wp.Task) {
+	_m.Called(options, taskChannel)
 }
 
 // PushToQueue provides a mock function with given fields: task
