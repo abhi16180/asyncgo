@@ -17,12 +17,12 @@ type WorkerPool interface {
 type WorkerPoolImpl struct {
 	options  *Options
 	executor ExecutorService
-	taskChan chan Task
+	taskChan *chan Task
 	wg       *sync.WaitGroup
 	Cancel   context.CancelFunc
 }
 
-func NewWorkerPool(executor *ExecutorServiceImpl, taskChan chan Task, wg *sync.WaitGroup, cancel context.CancelFunc) WorkerPool {
+func NewWorkerPool(executor *ExecutorServiceImpl, taskChan *chan Task, wg *sync.WaitGroup, cancel context.CancelFunc) WorkerPool {
 	return &WorkerPoolImpl{
 		executor: executor,
 		taskChan: taskChan,

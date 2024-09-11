@@ -32,6 +32,8 @@ type ExecutorServiceImpl struct {
 // Submit Spawns new goroutine everytime this function is called.
 // If you have large number of tasks use NewFixedWorkerPool instead
 func (e *ExecutorServiceImpl) Submit(function interface{}, args ...interface{}) (*Future, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
 	resultChan := make(chan []interface{})
 	task := NewTask(resultChan, function, args)
 	go func() {
@@ -52,6 +54,8 @@ func (t *ExecutorServiceImpl) pushToQueue(task *Task) {
 // *Note* - If you are not sure about bufferSize, do not set it explicitly.
 // Default bufferSize will be set to BufferedChannelSize
 func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
+	mutex.Lock()
+	defer mutex.Unlock()
 	options = GetOrDefaultWorkerPoolOptions(options)
 	ctx, cancel := context.WithCancel(context.Background())
 	taskChan := make(chan Task, options.BufferSize)
@@ -61,7 +65,7 @@ func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
 	}
 	wg.Add(1)
 	go e.taskQueue.ProcessQueue(options, taskChan)
-	return NewWorkerPool(e, taskChan, &wg, cancel)
+	return NewWorkerPool(e, &taskChan, &wg, cancel)
 }
 
 // NewExecutorService Creates new executorService
