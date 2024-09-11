@@ -8,6 +8,47 @@ import (
 	"time"
 )
 
+//go:generate mockery --name=WorkerPool --output=./mocks --outpkg=mocks
+type WorkerPool interface {
+	Submit(function interface{}, args ...interface{}) (*Future, error)
+	GetPoolSize() int64
+	GetChannelBufferSize() int64
+}
+type WorkerPoolImpl struct {
+	options  *Options
+	executor ExecutorService
+	taskChan chan Task
+	wg       *sync.WaitGroup
+	Cancel   context.CancelFunc
+}
+
+func NewWorkerPool(executor *ExecutorServiceImpl, taskChan chan Task, wg *sync.WaitGroup, cancel context.CancelFunc) WorkerPool {
+	return &WorkerPoolImpl{
+		executor: executor,
+		taskChan: taskChan,
+		wg:       wg,
+		Cancel:   cancel,
+	}
+}
+
+// Submit Creates new task from function and adds to task queue. This does not execute the function instantaneously.
+// Will be eventually processed by the worker(s). For instantaneous execution, use ExecutorService.Submit
+// instead
+func (w *WorkerPoolImpl) Submit(function interface{}, args ...interface{}) (*Future, error) {
+	resultChan := make(chan []interface{})
+	task := NewTask(resultChan, function, args)
+	w.executor.pushToQueue(&task)
+	return NewFuture(resultChan), nil
+}
+
+func (w *WorkerPoolImpl) GetPoolSize() int64 {
+	return w.options.WorkerCount
+}
+
+func (w *WorkerPoolImpl) GetChannelBufferSize() int64 {
+	return w.options.BufferSize
+}
+
 //go:generate mockery --name=Worker --output=./mocks --outpkg=mocks
 type Worker interface {
 }

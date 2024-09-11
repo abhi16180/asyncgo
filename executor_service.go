@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"runtime"
 	"sync"
 )
 
@@ -51,6 +52,7 @@ func (t *ExecutorServiceImpl) pushToQueue(task *Task) {
 // *Note* - If you are not sure about bufferSize, do not set it explicitly.
 // Default bufferSize will be set to BufferedChannelSize
 func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
+	options = GetOrDefaultWorkerPoolOptions(options)
 	ctx, cancel := context.WithCancel(context.Background())
 	taskChan := make(chan Task, options.BufferSize)
 	for i := int64(0); i < options.WorkerCount; i++ {
@@ -70,29 +72,12 @@ func NewExecutorService() ExecutorService {
 	}
 }
 
-type WorkerPool struct {
-	options  *Options
-	executor ExecutorService
-	taskChan chan Task
-	wg       *sync.WaitGroup
-	Cancel   context.CancelFunc
-}
-
-func NewWorkerPool(executor *ExecutorServiceImpl, taskChan chan Task, wg *sync.WaitGroup, cancel context.CancelFunc) WorkerPool {
-	return WorkerPool{
-		executor: executor,
-		taskChan: taskChan,
-		wg:       wg,
-		Cancel:   cancel,
+func GetOrDefaultWorkerPoolOptions(inputOptions *Options) *Options {
+	if inputOptions != nil {
+		return inputOptions
 	}
-}
-
-// Submit Creates new task from function and adds to task queue. This does not execute the function instantaneously.
-// Will be eventually processed by the worker(s). For instantaneous execution, use ExecutorService.Submit
-// instead
-func (w *WorkerPool) Submit(function interface{}, args ...interface{}) (*Future, error) {
-	resultChan := make(chan []interface{})
-	task := NewTask(resultChan, function, args)
-	w.executor.pushToQueue(&task)
-	return NewFuture(resultChan), nil
+	return &Options{
+		WorkerCount: int64(runtime.NumCPU()),
+		BufferSize:  BufferedChannelSize,
+	}
 }

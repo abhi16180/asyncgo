@@ -14,18 +14,18 @@ type ExecutorService struct {
 }
 
 // NewFixedWorkerPool provides a mock function with given fields: options
-func (_m *ExecutorService) NewFixedWorkerPool(options *wp.Options) wp.WorkerPool {
+func (_m *ExecutorService) NewFixedWorkerPool(options *wp.Options) wp.WorkerPoolImpl {
 	ret := _m.Called(options)
 
 	if len(ret) == 0 {
 		panic("no return value specified for NewFixedWorkerPool")
 	}
 
-	var r0 wp.WorkerPool
-	if rf, ok := ret.Get(0).(func(*wp.Options) wp.WorkerPool); ok {
+	var r0 wp.WorkerPoolImpl
+	if rf, ok := ret.Get(0).(func(*wp.Options) wp.WorkerPoolImpl); ok {
 		r0 = rf(options)
 	} else {
-		r0 = ret.Get(0).(wp.WorkerPool)
+		r0 = ret.Get(0).(wp.WorkerPoolImpl)
 	}
 
 	return r0
