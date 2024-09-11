@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+//go:generate mockery --name=Worker --output=./mocks --outpkg=mocks
 type Worker interface {
 }
 

@@ -7,6 +7,7 @@ import (
 // TODO remove hardcoded vals
 var channelBuffer = 20
 
+//go:generate mockery --name=TaskQueue --output=./mocks --outpkg=mocks
 type TaskQueue interface {
 	PushToQueue(task *Task)
 	PopTask() *Task

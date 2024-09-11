@@ -1,6 +1,7 @@
 package wp
 
 // TODO add more funcs
+
 type Future struct {
 	resultChan <-chan []interface{}
 	result     []interface{}
@@ -12,6 +13,6 @@ func NewFuture(resultChannel <-chan []interface{}) *Future {
 	}
 }
 
-func (f *Future) GetResult() interface{} {
+func (f *Future) GetResult() []interface{} {
 	return <-f.resultChan
 }

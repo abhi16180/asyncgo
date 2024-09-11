@@ -11,6 +11,7 @@ import (
 var wg sync.WaitGroup
 var mutex sync.Mutex
 
+//go:generate mockery --name=ExecutorService --output=./mocks --outpkg=mocks
 type ExecutorService interface {
 	Submit(function interface{}, args ...interface{}) (*Future, error)
 	NewFixedWorkerPool(workers int64) WorkerPool

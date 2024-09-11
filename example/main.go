@@ -43,11 +43,11 @@ func main() {
 
 }
 
-func s() S {
+func s() (S, int) {
 	time.Sleep(2000 * time.Millisecond)
 	return S{
 		V: 1,
-	}
+	}, 10
 }
 
 //type ExecutorService struct {
