@@ -28,7 +28,10 @@ func main() {
 	fmt.Println("Hello World")
 
 	executorService := wp.NewExecutorService()
-	workerPool := executorService.NewFixedWorkerPool(10)
+	workerPool := executorService.NewFixedWorkerPool(&wp.Options{
+		WorkerCount: 10,
+		BufferSize:  10,
+	})
 	for i := 0; i < 1; i++ {
 		f, _ := workerPool.Submit(s)
 		futures = append(futures, f)

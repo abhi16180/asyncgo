@@ -11,7 +11,7 @@ var channelBuffer = 20
 type TaskQueue interface {
 	PushToQueue(task *Task)
 	PopTask() *Task
-	ProcessQueue(taskChannel chan<- Task)
+	ProcessQueue(options *Options, taskChannel chan<- Task)
 }
 
 type TaskQueueImpl struct {
@@ -38,9 +38,9 @@ func (t *TaskQueueImpl) PopTask() *Task {
 	return nil
 }
 
-func (t *TaskQueueImpl) ProcessQueue(taskChannel chan<- Task) {
+func (t *TaskQueueImpl) ProcessQueue(options *Options, taskChannel chan<- Task) {
 	for {
-		if len(taskChannel) >= channelBuffer {
+		if int64(len(taskChannel)) >= options.BufferSize {
 			time.Sleep(100 * time.Millisecond)
 			continue
 		}

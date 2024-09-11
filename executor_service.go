@@ -7,15 +7,21 @@ import (
 	"sync"
 )
 
-// TODO add more funcs
+const BufferedChannelSize int64 = 20
+
 var wg sync.WaitGroup
 var mutex sync.Mutex
 
 //go:generate mockery --name=ExecutorService --output=./mocks --outpkg=mocks
 type ExecutorService interface {
 	Submit(function interface{}, args ...interface{}) (*Future, error)
-	NewFixedWorkerPool(workers int64) WorkerPool
+	NewFixedWorkerPool(options *Options) WorkerPool
 	pushToQueue(task *Task)
+}
+
+type Options struct {
+	WorkerCount int64
+	BufferSize  int64
 }
 
 type ExecutorServiceImpl struct {
@@ -41,19 +47,22 @@ func (t *ExecutorServiceImpl) pushToQueue(task *Task) {
 	t.taskQueue.PushToQueue(task)
 }
 
-// NewFixedWorkerPool Creates pool of workers with N go-routines. Spawns separate go-routine for queue processor
-func (e *ExecutorServiceImpl) NewFixedWorkerPool(workers int64) WorkerPool {
+// NewFixedWorkerPool Creates pool of workers with given options. Spawns separate go-routine for queue processor
+// *Note* - If you are not sure about bufferSize, do not set it explicitly.
+// Default bufferSize will be set to BufferedChannelSize
+func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
 	ctx, cancel := context.WithCancel(context.Background())
-	taskChan := make(chan Task, 20)
-	for i := int64(0); i < workers; i++ {
+	taskChan := make(chan Task, options.BufferSize)
+	for i := int64(0); i < options.WorkerCount; i++ {
 		wg.Add(1)
 		go NewWorker(ctx, &wg, taskChan, i)
 	}
 	wg.Add(1)
-	go e.taskQueue.ProcessQueue(taskChan)
+	go e.taskQueue.ProcessQueue(options, taskChan)
 	return NewWorkerPool(e, taskChan, &wg, cancel)
 }
 
+// NewExecutorService Creates new executorService
 func NewExecutorService() ExecutorService {
 	taskQueue := TaskQueueImpl{}
 	return &ExecutorServiceImpl{
@@ -62,13 +71,14 @@ func NewExecutorService() ExecutorService {
 }
 
 type WorkerPool struct {
+	options  *Options
 	executor ExecutorService
 	taskChan chan Task
 	wg       *sync.WaitGroup
 	Cancel   context.CancelFunc
 }
 
-func NewWorkerPool(executor ExecutorService, taskChan chan Task, wg *sync.WaitGroup, cancel context.CancelFunc) WorkerPool {
+func NewWorkerPool(executor *ExecutorServiceImpl, taskChan chan Task, wg *sync.WaitGroup, cancel context.CancelFunc) WorkerPool {
 	return WorkerPool{
 		executor: executor,
 		taskChan: taskChan,
