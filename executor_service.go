@@ -32,7 +32,7 @@ type Options struct {
 }
 
 type ExecutorServiceImpl struct {
-	taskQueue taskQueue
+	taskQueue TaskQueue
 }
 
 func (e *ExecutorServiceImpl) Submit(function interface{}, args ...interface{}) (*Future, error) {
