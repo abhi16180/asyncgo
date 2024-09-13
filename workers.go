@@ -10,11 +10,13 @@ import (
 
 //go:generate mockery --name=WorkerPool --output=./mocks --outpkg=mocks
 type WorkerPool interface {
-	// Submit Creates new task from function and adds to task queue. This does not execute the function instantaneously.
+	// Submit creates new task from function and adds to task queue. This does not execute the function instantaneously.
 	// Will be eventually processed by the worker(s). For instantaneous execution, use ExecutorService.Submit
 	// instead
 	Submit(function interface{}, args ...interface{}) (*Future, error)
+	// GetPoolSize returns the current worker pool size
 	GetPoolSize() int64
+	// GetChannelBufferSize returns the current channel buffer size
 	GetChannelBufferSize() int64
 }
 type WorkerPoolImpl struct {
@@ -56,6 +58,7 @@ type Worker interface {
 type WorkerImpl struct {
 }
 
+// NewWorker creates a new worker which processes tasks from tasks channel
 func NewWorker(ctx context.Context, wg *sync.WaitGroup, tasks <-chan Task, id int64) {
 	defer wg.Done()
 	log.Println("New worker started")

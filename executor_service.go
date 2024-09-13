@@ -15,14 +15,14 @@ var mutex sync.Mutex
 
 //go:generate mockery --name=ExecutorService --output=./mocks --outpkg=mocks
 type ExecutorService interface {
-	// Submit Spawns new goroutine everytime this function is called.
+	// Submit spawns new goroutine everytime this function is called.
 	// If you have large number of tasks use NewFixedWorkerPool instead
 	Submit(function interface{}, args ...interface{}) (*Future, error)
-	// NewFixedWorkerPool Creates pool of workers with given options. Spawns separate go-routine for queue processor
+	// NewFixedWorkerPool creates pool of workers with given options. Spawns separate go-routine for queue processor
 	// *Note* - If you are not sure about bufferSize, do not set it explicitly.
 	// Default bufferSize will be set to BufferedChannelSize
 	NewFixedWorkerPool(options *Options) WorkerPool
-	// pushToQueue Adds task to task queue associated with the worker pool
+	// pushToQueue adds task to task queue associated with the worker pool
 	pushToQueue(task *Task)
 }
 
@@ -49,8 +49,8 @@ func (e *ExecutorServiceImpl) Submit(function interface{}, args ...interface{}) 
 	return NewFuture(resultChan), nil
 }
 
-func (t *ExecutorServiceImpl) pushToQueue(task *Task) {
-	t.taskQueue.PushToQueue(task)
+func (e *ExecutorServiceImpl) pushToQueue(task *Task) {
+	e.taskQueue.PushToQueue(task)
 }
 
 func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
@@ -70,9 +70,9 @@ func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
 
 // NewExecutorService Creates new executorService
 func NewExecutorService() ExecutorService {
-	taskQueue := taskQueueImpl{}
+	tq := taskQueueImpl{}
 	return &ExecutorServiceImpl{
-		taskQueue: &taskQueue,
+		taskQueue: &tq,
 	}
 }
 
