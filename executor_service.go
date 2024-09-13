@@ -78,6 +78,12 @@ func NewExecutorService() ExecutorService {
 
 func GetOrDefaultWorkerPoolOptions(inputOptions *Options) *Options {
 	if inputOptions != nil {
+		if inputOptions.WorkerCount == 0 {
+			inputOptions.WorkerCount = int64(runtime.NumCPU())
+		}
+		if inputOptions.BufferSize == 0 {
+			inputOptions.BufferSize = BufferedChannelSize
+		}
 		return inputOptions
 	}
 	return &Options{

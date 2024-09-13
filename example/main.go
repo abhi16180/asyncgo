@@ -11,25 +11,11 @@ type S struct {
 }
 
 func main() {
-	//executorService := NewExecutorService()
 	futures := make([]*wp.Future, 0)
-	//
-	//for i := 0; i < 1235; i++ {
-	//	f, err := executorService.Submit(s)
-	//	if err != nil {
-	//		fmt.Println(err)
-	//	}
-	//	futures = append(futures, f)
-	//}
-	//
-	//for _, future := range futures {
-	//	fmt.Println(future.Get())
-	//}
 	now := time.Now()
 	fmt.Println("Hello World")
 
 	executorService := wp.NewExecutorService()
-
 	workerPool := executorService.NewFixedWorkerPool(&wp.Options{
 		WorkerCount: 1,
 		BufferSize:  20,
@@ -38,10 +24,6 @@ func main() {
 		f, _ := workerPool.Submit(s)
 		futures = append(futures, f)
 	}
-	//for i := 0; i < 1; i++ {
-	//	fmt.Println(i, futures[i].GetResult())
-	//}
-
 	for i := 0; i < 1; i++ {
 		fmt.Println(i, futures[i].GetResult())
 	}
