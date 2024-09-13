@@ -15,8 +15,14 @@ var mutex sync.Mutex
 
 //go:generate mockery --name=ExecutorService --output=./mocks --outpkg=mocks
 type ExecutorService interface {
+	// Submit Spawns new goroutine everytime this function is called.
+	// If you have large number of tasks use NewFixedWorkerPool instead
 	Submit(function interface{}, args ...interface{}) (*Future, error)
+	// NewFixedWorkerPool Creates pool of workers with given options. Spawns separate go-routine for queue processor
+	// *Note* - If you are not sure about bufferSize, do not set it explicitly.
+	// Default bufferSize will be set to BufferedChannelSize
 	NewFixedWorkerPool(options *Options) WorkerPool
+	// pushToQueue Adds task to task queue associated with the worker pool
 	pushToQueue(task *Task)
 }
 
@@ -26,11 +32,9 @@ type Options struct {
 }
 
 type ExecutorServiceImpl struct {
-	taskQueue TaskQueue
+	taskQueue taskQueue
 }
 
-// Submit Spawns new goroutine everytime this function is called.
-// If you have large number of tasks use NewFixedWorkerPool instead
 func (e *ExecutorServiceImpl) Submit(function interface{}, args ...interface{}) (*Future, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -45,14 +49,10 @@ func (e *ExecutorServiceImpl) Submit(function interface{}, args ...interface{}) 
 	return NewFuture(resultChan), nil
 }
 
-// pushToQueue Adds task to task queue associated with the worker pool
 func (t *ExecutorServiceImpl) pushToQueue(task *Task) {
 	t.taskQueue.PushToQueue(task)
 }
 
-// NewFixedWorkerPool Creates pool of workers with given options. Spawns separate go-routine for queue processor
-// *Note* - If you are not sure about bufferSize, do not set it explicitly.
-// Default bufferSize will be set to BufferedChannelSize
 func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -70,7 +70,7 @@ func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
 
 // NewExecutorService Creates new executorService
 func NewExecutorService() ExecutorService {
-	taskQueue := TaskQueueImpl{}
+	taskQueue := taskQueueImpl{}
 	return &ExecutorServiceImpl{
 		taskQueue: &taskQueue,
 	}

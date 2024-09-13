@@ -4,26 +4,26 @@ import (
 	"time"
 )
 
-//go:generate mockery --name=TaskQueue --output=./mocks --outpkg=mocks
-type TaskQueue interface {
+//go:generate mockery --name=taskQueue --output=./mocks --outpkg=mocks
+type taskQueue interface {
 	PushToQueue(task *Task)
 	PopTask() *Task
 	ProcessQueue(options *Options, taskChannel chan<- Task)
 }
 
-type TaskQueueImpl struct {
+type taskQueueImpl struct {
 	size  int
 	tasks []Task
 }
 
-func (t *TaskQueueImpl) PushToQueue(task *Task) {
+func (t *taskQueueImpl) PushToQueue(task *Task) {
 	mutex.Lock()
 	defer mutex.Unlock()
 	t.size++
 	t.tasks = append(t.tasks, *task)
 }
 
-func (t *TaskQueueImpl) PopTask() *Task {
+func (t *taskQueueImpl) PopTask() *Task {
 	mutex.Lock()
 	defer mutex.Unlock()
 	if t.size > 0 {
@@ -35,10 +35,10 @@ func (t *TaskQueueImpl) PopTask() *Task {
 	return nil
 }
 
-func (t *TaskQueueImpl) ProcessQueue(options *Options, taskChannel chan<- Task) {
+func (t *taskQueueImpl) ProcessQueue(options *Options, taskChannel chan<- Task) {
 	for {
 		if int64(len(taskChannel)) >= options.BufferSize {
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(1 * time.Millisecond)
 			continue
 		}
 		task := t.PopTask()
