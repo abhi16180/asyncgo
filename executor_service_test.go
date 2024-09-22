@@ -56,11 +56,11 @@ func TestExecutorServiceImpl_Submit(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &ExecutorServiceImpl{}
 			got, _ := e.Submit(tt.args.function, tt.args.args...)
+			result, err := got.GetResult()
 			if tt.wantErr {
-				result := got.GetResult()
-				assert.Equal(t, tt.err, result[0].(error))
+				assert.Equal(t, tt.err, err)
 			} else {
-				assert.Equal(t, tt.want, got.GetResult())
+				assert.Equal(t, tt.want, result)
 			}
 		})
 	}

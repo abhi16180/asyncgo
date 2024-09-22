@@ -19,11 +19,16 @@ func main() {
 		BufferSize:  20,
 	})
 	for i := 0; i < 10; i++ {
-		f, _ := workerPool.Submit(testFunction)
+		f, _ := workerPool.Submit(testFunction, 1)
 		futures = append(futures, f)
 	}
 	for i := 0; i < 10; i++ {
-		fmt.Println(i, futures[i].GetResult())
+		result, executionErr := futures[i].GetResult()
+		if executionErr != nil {
+			fmt.Println(executionErr)
+			continue
+		}
+		fmt.Println(result)
 	}
 	fmt.Printf("Time cost %v\n", time.Now().Sub(now))
 

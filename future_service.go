@@ -3,8 +3,9 @@ package wp
 // TODO add more funcs
 
 type Future struct {
-	resultChan <-chan []interface{}
-	result     []interface{}
+	resultChan     <-chan []interface{}
+	result         []interface{}
+	executionError error
 }
 
 func NewFuture(resultChannel <-chan []interface{}) *Future {
@@ -13,6 +14,16 @@ func NewFuture(resultChannel <-chan []interface{}) *Future {
 	}
 }
 
-func (f *Future) GetResult() []interface{} {
-	return <-f.resultChan
+func (f *Future) GetResult() ([]interface{}, error) {
+	f.result = <-f.resultChan
+	if len(f.result) == 0 {
+		return f.result, nil
+	}
+	if len(f.result) == 1 {
+		switch v := f.result[0].(type) {
+		case error:
+			f.executionError = v
+		}
+	}
+	return f.result, f.executionError
 }
