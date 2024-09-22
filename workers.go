@@ -18,6 +18,9 @@ type WorkerPool interface {
 	GetPoolSize() int64
 	// GetChannelBufferSize returns the current channel buffer size
 	GetChannelBufferSize() int64
+	// Terminates all the workers in workerpool
+	// TODO gracefully terminate
+	Terminate()
 }
 type WorkerPoolImpl struct {
 	options   *Options
@@ -51,6 +54,10 @@ func (w *WorkerPoolImpl) GetPoolSize() int64 {
 
 func (w *WorkerPoolImpl) GetChannelBufferSize() int64 {
 	return w.options.BufferSize
+}
+
+func (w *WorkerPoolImpl) Terminate() {
+	w.Cancel()
 }
 
 //go:generate mockery --name=Worker --output=./mocks --outpkg=mocks

@@ -65,3 +65,31 @@ func TestExecutorServiceImpl_Submit(t *testing.T) {
 		})
 	}
 }
+
+func TestExecutorServiceImpl_NewFixedWorkerPool(t *testing.T) {
+	type args struct {
+		options *Options
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "success",
+			args: args{
+				options: &Options{
+					WorkerCount: 2,
+					BufferSize:  10,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := &ExecutorServiceImpl{}
+			wp := e.NewFixedWorkerPool(tt.args.options)
+			assert.NotNil(t, wp, "NewFixedWorkerPool(%v)", tt.args.options)
+			wp.Terminate()
+		})
+	}
+}
