@@ -13,15 +13,13 @@ type S struct {
 func main() {
 	futures := make([]*wp.Future, 0)
 	now := time.Now()
-	fmt.Println("Hello World")
-
 	executorService := wp.NewExecutorService()
 	workerPool := executorService.NewFixedWorkerPool(&wp.Options{
 		WorkerCount: 1,
 		BufferSize:  20,
 	})
 	for i := 0; i < 1; i++ {
-		f, _ := workerPool.Submit(s)
+		f, _ := workerPool.Submit(testFunction)
 		futures = append(futures, f)
 	}
 	for i := 0; i < 1; i++ {
@@ -31,7 +29,7 @@ func main() {
 
 }
 
-func s() (S, int) {
+func testFunction() (S, int) {
 	time.Sleep(2000 * time.Millisecond)
 	return S{
 		V: 1,
