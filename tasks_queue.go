@@ -17,19 +17,19 @@ type TaskQueue interface {
 	ProcessQueue(options *Options, taskChannel chan<- Task)
 }
 
-type taskQueueImpl struct {
+type TaskQueueImpl struct {
 	size  int
 	tasks []Task
 }
 
-func (t *taskQueueImpl) PushToQueue(task *Task) {
+func (t *TaskQueueImpl) PushToQueue(task *Task) {
 	mutex.Lock()
 	defer mutex.Unlock()
 	t.size++
 	t.tasks = append(t.tasks, *task)
 }
 
-func (t *taskQueueImpl) PopTask() *Task {
+func (t *TaskQueueImpl) PopTask() *Task {
 	mutex.Lock()
 	defer mutex.Unlock()
 	if t.size > 0 {
@@ -41,7 +41,7 @@ func (t *taskQueueImpl) PopTask() *Task {
 	return nil
 }
 
-func (t *taskQueueImpl) ProcessQueue(options *Options, taskChannel chan<- Task) {
+func (t *TaskQueueImpl) ProcessQueue(options *Options, taskChannel chan<- Task) {
 	for {
 		if int64(len(taskChannel)) >= options.BufferSize {
 			time.Sleep(1 * time.Millisecond)
@@ -52,4 +52,8 @@ func (t *taskQueueImpl) ProcessQueue(options *Options, taskChannel chan<- Task) 
 			taskChannel <- *task
 		}
 	}
+}
+
+func NewTaskQueue() TaskQueue {
+	return &TaskQueueImpl{}
 }

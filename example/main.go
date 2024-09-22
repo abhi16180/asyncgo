@@ -15,14 +15,14 @@ func main() {
 	now := time.Now()
 	executorService := wp.NewExecutorService()
 	workerPool := executorService.NewFixedWorkerPool(&wp.Options{
-		WorkerCount: 1,
+		WorkerCount: 10,
 		BufferSize:  20,
 	})
-	for i := 0; i < 1; i++ {
+	for i := 0; i < 10; i++ {
 		f, _ := workerPool.Submit(testFunction)
 		futures = append(futures, f)
 	}
-	for i := 0; i < 1; i++ {
+	for i := 0; i < 10; i++ {
 		fmt.Println(i, futures[i].GetResult())
 	}
 	fmt.Printf("Time cost %v\n", time.Now().Sub(now))

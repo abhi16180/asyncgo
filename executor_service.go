@@ -23,7 +23,6 @@ type ExecutorService interface {
 	// Default bufferSize will be set to BufferedChannelSize
 	NewFixedWorkerPool(options *Options) WorkerPool
 	// pushToQueue adds task to task queue associated with the worker pool
-	pushToQueue(task *Task)
 }
 
 type Options struct {
@@ -32,7 +31,6 @@ type Options struct {
 }
 
 type ExecutorServiceImpl struct {
-	taskQueue TaskQueue
 }
 
 func (e *ExecutorServiceImpl) Submit(function interface{}, args ...interface{}) (*Future, error) {
@@ -49,31 +47,25 @@ func (e *ExecutorServiceImpl) Submit(function interface{}, args ...interface{}) 
 	return NewFuture(resultChan), nil
 }
 
-func (e *ExecutorServiceImpl) pushToQueue(task *Task) {
-	e.taskQueue.PushToQueue(task)
-}
-
 func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
 	mutex.Lock()
 	defer mutex.Unlock()
 	options = GetOrDefaultWorkerPoolOptions(options)
 	ctx, cancel := context.WithCancel(context.Background())
 	taskChan := make(chan Task, options.BufferSize)
+	taskQueue := NewTaskQueue()
+	wg.Add(1)
+	go taskQueue.ProcessQueue(options, taskChan)
 	for i := int64(0); i < options.WorkerCount; i++ {
 		wg.Add(1)
 		go NewWorker(ctx, &wg, taskChan, i)
 	}
-	wg.Add(1)
-	go e.taskQueue.ProcessQueue(options, taskChan)
-	return NewWorkerPool(e, &taskChan, &wg, cancel)
+	return NewWorkerPool(e, taskQueue, &taskChan, &wg, cancel)
 }
 
 // NewExecutorService Creates new executorService
 func NewExecutorService() ExecutorService {
-	tq := taskQueueImpl{}
-	return &ExecutorServiceImpl{
-		taskQueue: &tq,
-	}
+	return &ExecutorServiceImpl{}
 }
 
 func GetOrDefaultWorkerPoolOptions(inputOptions *Options) *Options {

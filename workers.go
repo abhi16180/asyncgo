@@ -20,26 +20,28 @@ type WorkerPool interface {
 	GetChannelBufferSize() int64
 }
 type WorkerPoolImpl struct {
-	options  *Options
-	executor ExecutorService
-	taskChan *chan Task
-	wg       *sync.WaitGroup
-	Cancel   context.CancelFunc
+	options   *Options
+	executor  ExecutorService
+	taskChan  *chan Task
+	wg        *sync.WaitGroup
+	Cancel    context.CancelFunc
+	taskQueue TaskQueue
 }
 
-func NewWorkerPool(executor *ExecutorServiceImpl, taskChan *chan Task, wg *sync.WaitGroup, cancel context.CancelFunc) WorkerPool {
+func NewWorkerPool(executor *ExecutorServiceImpl, taskQueue TaskQueue, taskChan *chan Task, wg *sync.WaitGroup, cancel context.CancelFunc) WorkerPool {
 	return &WorkerPoolImpl{
-		executor: executor,
-		taskChan: taskChan,
-		wg:       wg,
-		Cancel:   cancel,
+		executor:  executor,
+		taskChan:  taskChan,
+		wg:        wg,
+		Cancel:    cancel,
+		taskQueue: taskQueue,
 	}
 }
 
 func (w *WorkerPoolImpl) Submit(function interface{}, args ...interface{}) (*Future, error) {
 	resultChan := make(chan []interface{})
 	task := NewTask(resultChan, function, args)
-	w.executor.pushToQueue(&task)
+	w.taskQueue.PushToQueue(&task)
 	return NewFuture(resultChan), nil
 }
 
