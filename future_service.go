@@ -16,9 +16,6 @@ func NewFuture(resultChannel <-chan []interface{}) *Future {
 
 func (f *Future) GetResult() ([]interface{}, error) {
 	f.result = <-f.resultChan
-	if len(f.result) == 0 {
-		return f.result, nil
-	}
 	if len(f.result) == 1 {
 		switch v := f.result[0].(type) {
 		case error:
