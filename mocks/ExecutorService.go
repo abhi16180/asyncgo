@@ -66,11 +66,6 @@ func (_m *ExecutorService) Submit(function interface{}, args ...interface{}) (*w
 	return r0, r1
 }
 
-// pushToQueue provides a mock function with given fields: task
-func (_m *ExecutorService) pushToQueue(task *wp.Task) {
-	_m.Called(task)
-}
-
 // NewExecutorService creates a new instance of ExecutorService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewExecutorService(t interface {
