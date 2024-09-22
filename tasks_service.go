@@ -1,6 +1,7 @@
 package wp
 
 import (
+	"fmt"
 	"reflect"
 	"wp/utils"
 )
@@ -27,6 +28,16 @@ func NewTask(resultChan chan<- []interface{}, function interface{}, args []inter
 
 func (t *TaskImpl) Execute() error {
 	val := reflect.ValueOf(t.function)
+	kind := val.Kind()
+	if kind != reflect.Func {
+		t.resultChannel <- []interface{}{fmt.Errorf("function must be a function")}
+		return fmt.Errorf("function must be a function")
+	}
+	numIn := val.Type().NumIn()
+	if numIn != len(t.args) {
+		t.resultChannel <- []interface{}{fmt.Errorf("function must have %d parameters", numIn)}
+		return fmt.Errorf("function must have %d parameters", numIn)
+	}
 	argSlice := make([]reflect.Value, len(t.args))
 	for i, arg := range t.args {
 		argSlice[i] = reflect.ValueOf(arg)
