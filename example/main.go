@@ -11,10 +11,10 @@ type S struct {
 }
 
 func main() {
-	futures := make([]*wp.Future, 0)
+	futures := make([]*quasar.Future, 0)
 	now := time.Now()
-	executorService := wp.NewExecutorService()
-	workerPool := executorService.NewFixedWorkerPool(&wp.Options{
+	executorService := quasar.NewExecutorService()
+	workerPool := executorService.NewFixedWorkerPool(&quasar.Options{
 		WorkerCount: 10,
 		BufferSize:  20,
 	})

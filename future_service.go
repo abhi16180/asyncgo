@@ -1,6 +1,4 @@
-package wp
-
-// TODO add more funcs
+package quasar
 
 type Future struct {
 	resultChan     <-chan []interface{}
