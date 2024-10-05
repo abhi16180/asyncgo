@@ -22,6 +22,7 @@ type WorkerPool interface {
 	// TODO gracefully terminate
 	Terminate()
 }
+
 type WorkerPoolImpl struct {
 	options   *Options
 	executor  ExecutorService
