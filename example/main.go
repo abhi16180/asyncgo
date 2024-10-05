@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"quasar"
 	"time"
-	"wp"
 )
 
 type S struct {
@@ -19,7 +19,7 @@ func main() {
 		BufferSize:  20,
 	})
 	for i := 0; i < 10; i++ {
-		f, _ := workerPool.Submit(testFunction, 1)
+		f, _ := workerPool.Submit(testFunction)
 		futures = append(futures, f)
 	}
 	for i := 0; i < 10; i++ {

@@ -2,8 +2,8 @@ package wp
 
 import (
 	"fmt"
+	"quasar/utils"
 	"reflect"
-	"wp/utils"
 )
 
 //go:generate mockery --name=Task --output=./mocks --outpkg=mocks

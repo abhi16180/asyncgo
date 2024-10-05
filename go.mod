@@ -1,4 +1,4 @@
-module wp
+module quasar
 
 go 1.22
 
