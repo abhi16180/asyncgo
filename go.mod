@@ -1,4 +1,4 @@
-module quasar
+module github.com/abhi16180/quasar
 
 go 1.22
 

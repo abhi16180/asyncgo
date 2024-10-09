@@ -2,7 +2,7 @@ package quasar
 
 import (
 	"fmt"
-	"quasar/utils"
+	"github.com/abhi16180/quasar/utils"
 	"reflect"
 )
 

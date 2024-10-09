@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	wp "quasar"
+	wp "github.com/abhi16180/quasar"
 
 	mock "github.com/stretchr/testify/mock"
 )

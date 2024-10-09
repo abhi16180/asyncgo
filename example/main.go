@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"quasar"
+	"github.com/abhi16180/quasar"
 	"time"
 )
 
