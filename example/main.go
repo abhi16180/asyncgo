@@ -18,11 +18,13 @@ func main() {
 		WorkerCount: 10,
 		BufferSize:  20,
 	})
-	for i := 0; i < 10; i++ {
+
+	for i := 0; i < 100; i++ {
 		f, _ := workerPool.Submit(testFunction)
 		futures = append(futures, f)
 	}
-	for i := 0; i < 10; i++ {
+
+	for i := 0; i < 100; i++ {
 		result, executionErr := futures[i].GetResult()
 		if executionErr != nil {
 			fmt.Println(executionErr)
@@ -31,11 +33,10 @@ func main() {
 		fmt.Println(result)
 	}
 	fmt.Printf("Time cost %v\n", time.Now().Sub(now))
-
 }
 
 func testFunction() (S, int) {
-	time.Sleep(2000 * time.Millisecond)
+	time.Sleep(2 * time.Second)
 	return S{
 		V: 1,
 	}, 10

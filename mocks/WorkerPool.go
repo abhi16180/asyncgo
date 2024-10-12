@@ -14,11 +14,11 @@ type WorkerPool struct {
 }
 
 // GetChannelBufferSize provides a mock function with given fields:
-func (_m *WorkerPool) GetChannelBufferSize() int64 {
+func (_m *WorkerPool) ChannelBufferSize() int64 {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetChannelBufferSize")
+		panic("no return value specified for ChannelBufferSize")
 	}
 
 	var r0 int64
@@ -32,11 +32,11 @@ func (_m *WorkerPool) GetChannelBufferSize() int64 {
 }
 
 // GetPoolSize provides a mock function with given fields:
-func (_m *WorkerPool) GetPoolSize() int64 {
+func (_m *WorkerPool) PoolSize() int64 {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetPoolSize")
+		panic("no return value specified for PoolSize")
 	}
 
 	var r0 int64

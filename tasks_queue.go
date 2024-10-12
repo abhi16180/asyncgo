@@ -1,6 +1,7 @@
 package quasar
 
 import (
+	"log"
 	"time"
 )
 
@@ -14,7 +15,7 @@ type TaskQueue interface {
 	// ProcessQueue continuously checks the buffered channel's size.
 	// If the buffered channel is not full, pops tasks from TaskQueue
 	// and sends to tasks channel
-	ProcessQueue(options *Options, taskChannel chan<- Task)
+	ProcessQueue(options *Options, taskChannel chan<- Task, shutDown <-chan interface{})
 }
 
 type TaskQueueImpl struct {
@@ -41,15 +42,20 @@ func (t *TaskQueueImpl) PopTask() *Task {
 	return nil
 }
 
-func (t *TaskQueueImpl) ProcessQueue(options *Options, taskChannel chan<- Task) {
+func (t *TaskQueueImpl) ProcessQueue(options *Options, taskChannel chan<- Task, shutDown <-chan interface{}) {
 	for {
-		if int64(len(taskChannel)) >= options.BufferSize {
-			time.Sleep(1 * time.Millisecond)
-			continue
-		}
-		task := t.PopTask()
-		if task != nil {
-			taskChannel <- *task
+		select {
+		case <-shutDown:
+			log.Printf("shutting down task queue")
+		default:
+			if int64(len(taskChannel)) >= options.BufferSize {
+				time.Sleep(1 * time.Millisecond)
+				continue
+			}
+			task := t.PopTask()
+			if task != nil {
+				taskChannel <- *task
+			}
 		}
 	}
 }

@@ -14,31 +14,31 @@ type WorkerPool interface {
 	// Will be eventually processed by the worker(s). For instantaneous execution, use ExecutorService.Submit
 	// instead
 	Submit(function interface{}, args ...interface{}) (*Future, error)
-	// GetPoolSize returns the current worker pool size
-	GetPoolSize() int64
-	// GetChannelBufferSize returns the current channel buffer size
-	GetChannelBufferSize() int64
-	// Terminates all the workers in workerpool
+	// PoolSize returns the current worker pool size
+	PoolSize() int64
+	// ChannelBufferSize returns the current channel buffer size
+	ChannelBufferSize() int64
+	// Terminate Terminates all the workers in worker pool
 	// TODO gracefully terminate
 	Terminate()
 }
 
 type WorkerPoolImpl struct {
 	options   *Options
-	executor  ExecutorService
 	taskChan  *chan Task
+	shutDown  *chan interface{}
 	wg        *sync.WaitGroup
 	Cancel    context.CancelFunc
 	taskQueue TaskQueue
 }
 
-func NewWorkerPool(executor *ExecutorServiceImpl, taskQueue TaskQueue, taskChan *chan Task, wg *sync.WaitGroup, cancel context.CancelFunc) WorkerPool {
+func NewWorkerPool(taskQueue TaskQueue, taskChan *chan Task, wg *sync.WaitGroup, cancel context.CancelFunc, shutDown *chan interface{}) WorkerPool {
 	return &WorkerPoolImpl{
-		executor:  executor,
 		taskChan:  taskChan,
 		wg:        wg,
 		Cancel:    cancel,
 		taskQueue: taskQueue,
+		shutDown:  shutDown,
 	}
 }
 
@@ -49,16 +49,17 @@ func (w *WorkerPoolImpl) Submit(function interface{}, args ...interface{}) (*Fut
 	return NewFuture(resultChan), nil
 }
 
-func (w *WorkerPoolImpl) GetPoolSize() int64 {
+func (w *WorkerPoolImpl) PoolSize() int64 {
 	return w.options.WorkerCount
 }
 
-func (w *WorkerPoolImpl) GetChannelBufferSize() int64 {
+func (w *WorkerPoolImpl) ChannelBufferSize() int64 {
 	return w.options.BufferSize
 }
 
 func (w *WorkerPoolImpl) Terminate() {
-	w.Cancel()
+	//w.Cancel()
+	*w.shutDown <- true
 }
 
 //go:generate mockery --name=Worker --output=./mocks --outpkg=mocks
