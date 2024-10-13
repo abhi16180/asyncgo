@@ -56,7 +56,7 @@ func (e *ExecutorService) NewFixedWorkerPool(options *Options) WorkerPool {
 	shutDown := make(chan interface{})
 	taskQueue := NewTaskQueue(&taskChan, &shutDown)
 	wg.Add(1)
-	go taskQueue.ProcessQueue(options)
+	go taskQueue.Process(options)
 	for i := int64(0); i < options.WorkerCount; i++ {
 		wg.Add(1)
 		go worker(ctx, &wg, taskChan, i)

@@ -13,11 +13,11 @@ type TaskQueue struct {
 }
 
 // PopTask provides a mock function with given fields:
-func (_m *TaskQueue) PopTask() *quasar.Task {
+func (_m *TaskQueue) Pop() *quasar.Task {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for PopTask")
+		panic("no return value specified for Pop")
 	}
 
 	var r0 *quasar.Task
@@ -33,16 +33,16 @@ func (_m *TaskQueue) PopTask() *quasar.Task {
 }
 
 // ProcessQueue provides a mock function with given fields: options
-func (_m *TaskQueue) ProcessQueue(options *quasar.Options) {
+func (_m *TaskQueue) Process(options *quasar.Options) {
 	_m.Called(options)
 }
 
 // PushToQueue provides a mock function with given fields: task
-func (_m *TaskQueue) PushToQueue(task *quasar.Task) error {
+func (_m *TaskQueue) Push(task *quasar.Task) error {
 	ret := _m.Called(task)
 
 	if len(ret) == 0 {
-		panic("no return value specified for PushToQueue")
+		panic("no return value specified for Push")
 	}
 
 	var r0 error

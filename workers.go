@@ -49,7 +49,7 @@ func NewWorkerPool(taskQueue TaskQueue, taskChan *chan Task, wg *sync.WaitGroup,
 func (w *WorkerPoolService) Submit(function interface{}, args ...interface{}) (*Future, error) {
 	resultChan := make(chan []interface{})
 	task := NewTask(resultChan, function, args)
-	err := w.taskQueue.PushToQueue(&task)
+	err := w.taskQueue.Push(&task)
 	if err != nil {
 		return nil, err
 	}

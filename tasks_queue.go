@@ -8,15 +8,15 @@ import (
 
 //go:generate mockery --name=TaskQueue --output=./mocks --outpkg=mocks
 type TaskQueue interface {
-	// PushToQueue pushes task to TaskQueue
-	PushToQueue(task *Task) error
-	// PopTask removes the first item from the queue and returns the pointer to it.
+	// Push pushes task to TaskQueue
+	Push(task *Task) error
+	// Pop removes the first item from the queue and returns the pointer to it.
 	// If item does not exist, returns nil
-	PopTask() *Task
-	// ProcessQueue continuously checks the buffered channel's size.
+	Pop() *Task
+	// Process continuously checks the buffered channel's size.
 	// If the buffered channel is not full, pops tasks from TaskQueue
 	// and sends to tasks channel
-	ProcessQueue(options *Options)
+	Process(options *Options)
 }
 
 type TaskQueueService struct {
@@ -27,7 +27,7 @@ type TaskQueueService struct {
 	shutDown       *chan interface{}
 }
 
-func (t *TaskQueueService) PushToQueue(task *Task) error {
+func (t *TaskQueueService) Push(task *Task) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 	if t.rejectNewTasks {
@@ -39,7 +39,7 @@ func (t *TaskQueueService) PushToQueue(task *Task) error {
 	return nil
 }
 
-func (t *TaskQueueService) PopTask() *Task {
+func (t *TaskQueueService) Pop() *Task {
 	mutex.Lock()
 	defer mutex.Unlock()
 	if t.size > 0 {
@@ -57,7 +57,7 @@ func (t *TaskQueueService) PopTask() *Task {
 	return nil
 }
 
-func (t *TaskQueueService) ProcessQueue(options *Options) {
+func (t *TaskQueueService) Process(options *Options) {
 	for {
 		select {
 		case _, ok := <-*t.shutDown:
@@ -72,7 +72,7 @@ func (t *TaskQueueService) ProcessQueue(options *Options) {
 				time.Sleep(1 * time.Millisecond)
 				continue
 			}
-			task := t.PopTask()
+			task := t.Pop()
 			if task != nil {
 				*t.taskChannel <- *task
 			}
