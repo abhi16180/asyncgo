@@ -59,7 +59,7 @@ func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
 	go taskQueue.ProcessQueue(options, taskChan, e.shutDown)
 	for i := int64(0); i < options.WorkerCount; i++ {
 		wg.Add(1)
-		go NewWorker(ctx, &wg, taskChan, i)
+		go worker(ctx, &wg, taskChan, i)
 	}
 	return NewWorkerPool(taskQueue, &taskChan, &wg, cancel, &e.shutDown)
 }

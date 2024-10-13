@@ -59,6 +59,9 @@ func (w *WorkerPoolImpl) ChannelBufferSize() int64 {
 
 func (w *WorkerPoolImpl) Terminate() {
 	//w.Cancel()
+	// close channel
+	// process all existing tasks
+	// return out of the workers
 	*w.shutDown <- true
 }
 
@@ -69,13 +72,17 @@ type Worker interface {
 type WorkerImpl struct {
 }
 
-// NewWorker creates a new worker which processes tasks from tasks channel
-func NewWorker(ctx context.Context, wg *sync.WaitGroup, tasks <-chan Task, id int64) {
+// worker creates a new worker which processes tasks from tasks channel
+func worker(ctx context.Context, wg *sync.WaitGroup, tasks <-chan Task, id int64) {
 	defer wg.Done()
 	log.Println("New worker started")
 	for {
 		select {
-		case task := <-tasks:
+		case task, ok := <-tasks:
+			if !ok {
+				log.Println("channel is closed, stopping the worker")
+				return
+			}
 			log.Println(fmt.Sprintf("Worker %d received task", id))
 			if err := task.Execute(); err != nil {
 				log.Println(fmt.Sprintf("Worker %d encountered error: %v", id, err))

@@ -47,6 +47,7 @@ func (t *TaskQueueImpl) ProcessQueue(options *Options, taskChannel chan<- Task, 
 		select {
 		case <-shutDown:
 			log.Printf("shutting down task queue")
+			return
 		default:
 			if int64(len(taskChannel)) >= options.BufferSize {
 				time.Sleep(1 * time.Millisecond)
