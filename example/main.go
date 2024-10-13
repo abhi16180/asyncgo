@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/abhi16180/quasar"
+	"log"
 	"time"
 )
 
@@ -18,13 +19,17 @@ func main() {
 		WorkerCount: 10,
 		BufferSize:  20,
 	})
-
-	for i := 0; i < 100; i++ {
-		f, _ := workerPool.Submit(testFunction)
-		futures = append(futures, f)
+	//workerPool.Terminate()
+	for i := 0; i < 10; i++ {
+		f, err := workerPool.Submit(testFunction)
+		if err != nil {
+			log.Println(err)
+		} else {
+			futures = append(futures, f)
+		}
 	}
 
-	for i := 0; i < 100; i++ {
+	for i, _ := range futures {
 		result, executionErr := futures[i].GetResult()
 		if executionErr != nil {
 			fmt.Println(executionErr)
