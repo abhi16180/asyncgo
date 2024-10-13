@@ -18,8 +18,12 @@ type WorkerPool interface {
 	PoolSize() int64
 	// ChannelBufferSize returns the current channel buffer size
 	ChannelBufferSize() int64
-	// Terminate Terminates all the workers in worker pool
-	// TODO gracefully terminate
+	// ShutdownGracefully -  guarantees all existing tasks will be executed.
+	// No new task(s) will be added to the task queue.
+	// Trying to Submit new task will return an error
+	ShutdownGracefully()
+	// Terminate terminates all the workers in worker pool - this is not graceful shutdown
+	// Any existing task might not run if this method is called in the middle
 	Terminate()
 }
 
@@ -60,12 +64,12 @@ func (w *WorkerPoolService) ChannelBufferSize() int64 {
 	return w.options.BufferSize
 }
 
-func (w *WorkerPoolService) Terminate() {
-	//w.Cancel()
-	// close channel
-	// process all existing tasks
-	// return out of the workers
+func (w *WorkerPoolService) ShutdownGracefully() {
 	*w.shutDown <- true
+}
+
+func (w *WorkerPoolService) Terminate() {
+	w.Cancel()
 }
 
 //go:generate mockery --name=Worker --output=./mocks --outpkg=mocks

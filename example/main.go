@@ -19,7 +19,7 @@ func main() {
 		WorkerCount: 10,
 		BufferSize:  20,
 	})
-	//workerPool.Terminate()
+	//workerPool.ShutdownGracefully()
 	for i := 0; i < 10; i++ {
 		f, err := workerPool.Submit(testFunction)
 		if err != nil {

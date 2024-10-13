@@ -89,7 +89,7 @@ func TestExecutorServiceImpl_NewFixedWorkerPool(t *testing.T) {
 			e := &ExecutorService{}
 			wp := e.NewFixedWorkerPool(tt.args.options)
 			assert.NotNil(t, wp, "NewFixedWorkerPool(%v)", tt.args.options)
-			wp.Terminate()
+			wp.ShutdownGracefully()
 		})
 	}
 }
