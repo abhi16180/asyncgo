@@ -86,6 +86,11 @@ func (_m *WorkerPool) Submit(function interface{}, args ...interface{}) (*quasar
 	return r0, r1
 }
 
+// Terminate provides a mock function with given fields:
+func (_m *WorkerPool) Terminate() {
+	_m.Called()
+}
+
 // NewWorkerPool creates a new instance of WorkerPool. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewWorkerPool(t interface {

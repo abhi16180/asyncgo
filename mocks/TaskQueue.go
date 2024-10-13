@@ -12,7 +12,7 @@ type TaskQueue struct {
 	mock.Mock
 }
 
-// PopTask provides a mock function with given fields:
+// Pop provides a mock function with given fields:
 func (_m *TaskQueue) Pop() *quasar.Task {
 	ret := _m.Called()
 
@@ -32,12 +32,12 @@ func (_m *TaskQueue) Pop() *quasar.Task {
 	return r0
 }
 
-// ProcessQueue provides a mock function with given fields: options
+// Process provides a mock function with given fields: options
 func (_m *TaskQueue) Process(options *quasar.Options) {
 	_m.Called(options)
 }
 
-// PushToQueue provides a mock function with given fields: task
+// Push provides a mock function with given fields: task
 func (_m *TaskQueue) Push(task *quasar.Task) error {
 	ret := _m.Called(task)
 
