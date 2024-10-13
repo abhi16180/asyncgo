@@ -31,7 +31,6 @@ type Options struct {
 }
 
 type ExecutorServiceImpl struct {
-	shutDown chan interface{}
 }
 
 func (e *ExecutorServiceImpl) Submit(function interface{}, args ...interface{}) (*Future, error) {
@@ -54,22 +53,20 @@ func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
 	options = GetOrDefaultWorkerPoolOptions(options)
 	ctx, cancel := context.WithCancel(context.Background())
 	taskChan := make(chan Task, options.BufferSize)
-	taskQueue := NewTaskQueue()
+	shutDown := make(chan interface{})
+	taskQueue := NewTaskQueue(&taskChan, &shutDown)
 	wg.Add(1)
-	go taskQueue.ProcessQueue(options, taskChan, e.shutDown)
+	go taskQueue.ProcessQueue(options)
 	for i := int64(0); i < options.WorkerCount; i++ {
 		wg.Add(1)
 		go worker(ctx, &wg, taskChan, i)
 	}
-	return NewWorkerPool(taskQueue, &taskChan, &wg, cancel, &e.shutDown)
+	return NewWorkerPool(taskQueue, &taskChan, &wg, cancel, &shutDown)
 }
 
 // NewExecutorService Creates new executorService
 func NewExecutorService() ExecutorService {
-	shutDown := make(chan interface{})
-	return &ExecutorServiceImpl{
-		shutDown: shutDown,
-	}
+	return &ExecutorServiceImpl{}
 }
 
 func GetOrDefaultWorkerPoolOptions(inputOptions *Options) *Options {

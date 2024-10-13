@@ -15,17 +15,23 @@ type TaskQueue interface {
 	// ProcessQueue continuously checks the buffered channel's size.
 	// If the buffered channel is not full, pops tasks from TaskQueue
 	// and sends to tasks channel
-	ProcessQueue(options *Options, taskChannel chan<- Task, shutDown <-chan interface{})
+	ProcessQueue(options *Options)
 }
 
 type TaskQueueImpl struct {
-	size  int
-	tasks []Task
+	size           int
+	rejectNewTasks bool
+	tasks          []Task
+	taskChannel    *chan Task
+	shutDown       *chan interface{}
 }
 
 func (t *TaskQueueImpl) PushToQueue(task *Task) {
 	mutex.Lock()
 	defer mutex.Unlock()
+	if t.rejectNewTasks {
+		log.Println("cannot add new task after closing worker pool")
+	}
 	t.size++
 	t.tasks = append(t.tasks, *task)
 }
@@ -39,28 +45,34 @@ func (t *TaskQueueImpl) PopTask() *Task {
 		t.tasks = t.tasks[1:]
 		return &task
 	}
+	if t.rejectNewTasks {
+
+	}
 	return nil
 }
 
-func (t *TaskQueueImpl) ProcessQueue(options *Options, taskChannel chan<- Task, shutDown <-chan interface{}) {
+func (t *TaskQueueImpl) ProcessQueue(options *Options) {
 	for {
 		select {
-		case <-shutDown:
+		case <-*t.shutDown:
 			log.Printf("shutting down task queue")
-			return
+			t.rejectNewTasks = true
 		default:
-			if int64(len(taskChannel)) >= options.BufferSize {
+			if int64(len(*t.taskChannel)) >= options.BufferSize {
 				time.Sleep(1 * time.Millisecond)
 				continue
 			}
 			task := t.PopTask()
 			if task != nil {
-				taskChannel <- *task
+				*t.taskChannel <- *task
 			}
 		}
 	}
 }
 
-func NewTaskQueue() TaskQueue {
-	return &TaskQueueImpl{}
+func NewTaskQueue(taskChan *chan Task, shutDown *chan interface{}) TaskQueue {
+	return &TaskQueueImpl{
+		taskChannel: taskChan,
+		shutDown:    shutDown,
+	}
 }
