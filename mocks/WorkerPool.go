@@ -3,8 +3,7 @@
 package mocks
 
 import (
-	wp "github.com/abhi16180/quasar"
-
+	quasar "github.com/abhi16180/quasar"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,7 +12,7 @@ type WorkerPool struct {
 	mock.Mock
 }
 
-// GetChannelBufferSize provides a mock function with given fields:
+// ChannelBufferSize provides a mock function with given fields:
 func (_m *WorkerPool) ChannelBufferSize() int64 {
 	ret := _m.Called()
 
@@ -31,7 +30,7 @@ func (_m *WorkerPool) ChannelBufferSize() int64 {
 	return r0
 }
 
-// GetPoolSize provides a mock function with given fields:
+// PoolSize provides a mock function with given fields:
 func (_m *WorkerPool) PoolSize() int64 {
 	ret := _m.Called()
 
@@ -50,7 +49,7 @@ func (_m *WorkerPool) PoolSize() int64 {
 }
 
 // Submit provides a mock function with given fields: function, args
-func (_m *WorkerPool) Submit(function interface{}, args ...interface{}) (*wp.Future, error) {
+func (_m *WorkerPool) Submit(function interface{}, args ...interface{}) (*quasar.Future, error) {
 	var _ca []interface{}
 	_ca = append(_ca, function)
 	_ca = append(_ca, args...)
@@ -60,16 +59,16 @@ func (_m *WorkerPool) Submit(function interface{}, args ...interface{}) (*wp.Fut
 		panic("no return value specified for Submit")
 	}
 
-	var r0 *wp.Future
+	var r0 *quasar.Future
 	var r1 error
-	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) (*wp.Future, error)); ok {
+	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) (*quasar.Future, error)); ok {
 		return rf(function, args...)
 	}
-	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) *wp.Future); ok {
+	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) *quasar.Future); ok {
 		r0 = rf(function, args...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*wp.Future)
+			r0 = ret.Get(0).(*quasar.Future)
 		}
 	}
 

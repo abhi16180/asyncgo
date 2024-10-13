@@ -3,8 +3,7 @@
 package mocks
 
 import (
-	wp "github.com/abhi16180/quasar"
-
+	quasar "github.com/abhi16180/quasar"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -14,33 +13,46 @@ type TaskQueue struct {
 }
 
 // PopTask provides a mock function with given fields:
-func (_m *TaskQueue) PopTask() *wp.Task {
+func (_m *TaskQueue) PopTask() *quasar.Task {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for PopTask")
 	}
 
-	var r0 *wp.Task
-	if rf, ok := ret.Get(0).(func() *wp.Task); ok {
+	var r0 *quasar.Task
+	if rf, ok := ret.Get(0).(func() *quasar.Task); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*wp.Task)
+			r0 = ret.Get(0).(*quasar.Task)
 		}
 	}
 
 	return r0
 }
 
-// ProcessQueue provides a mock function with given fields: options, taskChannel
-func (_m *TaskQueue) ProcessQueue(options *wp.Options, taskChannel chan<- wp.Task) {
-	_m.Called(options, taskChannel)
+// ProcessQueue provides a mock function with given fields: options
+func (_m *TaskQueue) ProcessQueue(options *quasar.Options) {
+	_m.Called(options)
 }
 
 // PushToQueue provides a mock function with given fields: task
-func (_m *TaskQueue) PushToQueue(task *wp.Task) {
-	_m.Called(task)
+func (_m *TaskQueue) PushToQueue(task *quasar.Task) error {
+	ret := _m.Called(task)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PushToQueue")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(*quasar.Task) error); ok {
+		r0 = rf(task)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // NewTaskQueue creates a new instance of TaskQueue. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

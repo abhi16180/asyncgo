@@ -3,8 +3,7 @@
 package mocks
 
 import (
-	wp "github.com/abhi16180/quasar"
-
+	quasar "github.com/abhi16180/quasar"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -14,19 +13,19 @@ type ExecutorService struct {
 }
 
 // NewFixedWorkerPool provides a mock function with given fields: options
-func (_m *ExecutorService) NewFixedWorkerPool(options *wp.Options) wp.WorkerPool {
+func (_m *ExecutorService) NewFixedWorkerPool(options *quasar.Options) quasar.WorkerPool {
 	ret := _m.Called(options)
 
 	if len(ret) == 0 {
 		panic("no return value specified for NewFixedWorkerPool")
 	}
 
-	var r0 wp.WorkerPool
-	if rf, ok := ret.Get(0).(func(*wp.Options) wp.WorkerPool); ok {
+	var r0 quasar.WorkerPool
+	if rf, ok := ret.Get(0).(func(*quasar.Options) quasar.WorkerPool); ok {
 		r0 = rf(options)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(wp.WorkerPool)
+			r0 = ret.Get(0).(quasar.WorkerPool)
 		}
 	}
 
@@ -34,7 +33,7 @@ func (_m *ExecutorService) NewFixedWorkerPool(options *wp.Options) wp.WorkerPool
 }
 
 // Submit provides a mock function with given fields: function, args
-func (_m *ExecutorService) Submit(function interface{}, args ...interface{}) (*wp.Future, error) {
+func (_m *ExecutorService) Submit(function interface{}, args ...interface{}) (*quasar.Future, error) {
 	var _ca []interface{}
 	_ca = append(_ca, function)
 	_ca = append(_ca, args...)
@@ -44,16 +43,16 @@ func (_m *ExecutorService) Submit(function interface{}, args ...interface{}) (*w
 		panic("no return value specified for Submit")
 	}
 
-	var r0 *wp.Future
+	var r0 *quasar.Future
 	var r1 error
-	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) (*wp.Future, error)); ok {
+	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) (*quasar.Future, error)); ok {
 		return rf(function, args...)
 	}
-	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) *wp.Future); ok {
+	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) *quasar.Future); ok {
 		r0 = rf(function, args...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*wp.Future)
+			r0 = ret.Get(0).(*quasar.Future)
 		}
 	}
 
