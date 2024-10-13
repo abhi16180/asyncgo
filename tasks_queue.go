@@ -19,7 +19,7 @@ type TaskQueue interface {
 	ProcessQueue(options *Options)
 }
 
-type TaskQueueImpl struct {
+type TaskQueueService struct {
 	size           int
 	rejectNewTasks bool
 	tasks          []Task
@@ -27,7 +27,7 @@ type TaskQueueImpl struct {
 	shutDown       *chan interface{}
 }
 
-func (t *TaskQueueImpl) PushToQueue(task *Task) error {
+func (t *TaskQueueService) PushToQueue(task *Task) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 	if t.rejectNewTasks {
@@ -39,7 +39,7 @@ func (t *TaskQueueImpl) PushToQueue(task *Task) error {
 	return nil
 }
 
-func (t *TaskQueueImpl) PopTask() *Task {
+func (t *TaskQueueService) PopTask() *Task {
 	mutex.Lock()
 	defer mutex.Unlock()
 	if t.size > 0 {
@@ -57,7 +57,7 @@ func (t *TaskQueueImpl) PopTask() *Task {
 	return nil
 }
 
-func (t *TaskQueueImpl) ProcessQueue(options *Options) {
+func (t *TaskQueueService) ProcessQueue(options *Options) {
 	for {
 		select {
 		case _, ok := <-*t.shutDown:
@@ -81,7 +81,7 @@ func (t *TaskQueueImpl) ProcessQueue(options *Options) {
 }
 
 func NewTaskQueue(taskChan *chan Task, shutDown *chan interface{}) TaskQueue {
-	return &TaskQueueImpl{
+	return &TaskQueueService{
 		taskChannel: taskChan,
 		shutDown:    shutDown,
 	}

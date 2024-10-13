@@ -12,21 +12,21 @@ type Task interface {
 	Execute() error
 }
 
-type TaskImpl struct {
+type TaskService struct {
 	resultChannel chan<- []interface{}
 	function      interface{}
 	args          []interface{}
 }
 
 func NewTask(resultChan chan<- []interface{}, function interface{}, args []interface{}) Task {
-	return &TaskImpl{
+	return &TaskService{
 		resultChannel: resultChan,
 		function:      function,
 		args:          args,
 	}
 }
 
-func (t *TaskImpl) Execute() error {
+func (t *TaskService) Execute() error {
 	val := reflect.ValueOf(t.function)
 	kind := val.Kind()
 	if kind != reflect.Func {

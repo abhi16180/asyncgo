@@ -11,7 +11,7 @@ import (
 //go:generate mockery --name=WorkerPool --output=./mocks --outpkg=mocks
 type WorkerPool interface {
 	// Submit creates new task from function and adds to task queue. This does not execute the function instantaneously.
-	// Will be eventually processed by the worker(s). For instantaneous execution, use ExecutorService.Submit
+	// Will be eventually processed by the worker(s). For instantaneous execution, use Executor.Submit
 	// instead
 	Submit(function interface{}, args ...interface{}) (*Future, error)
 	// PoolSize returns the current worker pool size
@@ -23,7 +23,7 @@ type WorkerPool interface {
 	Terminate()
 }
 
-type WorkerPoolImpl struct {
+type WorkerPoolService struct {
 	options   *Options
 	taskChan  *chan Task
 	shutDown  *chan interface{}
@@ -33,7 +33,7 @@ type WorkerPoolImpl struct {
 }
 
 func NewWorkerPool(taskQueue TaskQueue, taskChan *chan Task, wg *sync.WaitGroup, cancel context.CancelFunc, shutDown *chan interface{}) WorkerPool {
-	return &WorkerPoolImpl{
+	return &WorkerPoolService{
 		taskChan:  taskChan,
 		wg:        wg,
 		Cancel:    cancel,
@@ -42,7 +42,7 @@ func NewWorkerPool(taskQueue TaskQueue, taskChan *chan Task, wg *sync.WaitGroup,
 	}
 }
 
-func (w *WorkerPoolImpl) Submit(function interface{}, args ...interface{}) (*Future, error) {
+func (w *WorkerPoolService) Submit(function interface{}, args ...interface{}) (*Future, error) {
 	resultChan := make(chan []interface{})
 	task := NewTask(resultChan, function, args)
 	err := w.taskQueue.PushToQueue(&task)
@@ -52,15 +52,15 @@ func (w *WorkerPoolImpl) Submit(function interface{}, args ...interface{}) (*Fut
 	return NewFuture(resultChan), nil
 }
 
-func (w *WorkerPoolImpl) PoolSize() int64 {
+func (w *WorkerPoolService) PoolSize() int64 {
 	return w.options.WorkerCount
 }
 
-func (w *WorkerPoolImpl) ChannelBufferSize() int64 {
+func (w *WorkerPoolService) ChannelBufferSize() int64 {
 	return w.options.BufferSize
 }
 
-func (w *WorkerPoolImpl) Terminate() {
+func (w *WorkerPoolService) Terminate() {
 	//w.Cancel()
 	// close channel
 	// process all existing tasks

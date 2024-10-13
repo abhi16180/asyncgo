@@ -47,14 +47,14 @@ func testFunction() (S, int) {
 	}, 10
 }
 
-//type ExecutorService struct {
+//type Executor struct {
 //}
 //
-//func NewExecutorService() *ExecutorService {
-//	return &ExecutorService{}
+//func NewExecutorService() *Executor {
+//	return &Executor{}
 //}
 //
-//func (e *ExecutorService) Submit(fn interface{}, args ...interface{}) (*Future, error) {
+//func (e *Executor) Submit(fn interface{}, args ...interface{}) (*Future, error) {
 //	if reflect.TypeOf(fn).Kind() != reflect.Func {
 //		return nil, fmt.Errorf("fn must be a function")
 //	}
@@ -67,7 +67,7 @@ func testFunction() (S, int) {
 //	return NewFuture(ch), nil
 //}
 //
-//func (e *ExecutorService) run(ch chan<- interface{}, fn interface{}, args ...interface{}) {
+//func (e *Executor) run(ch chan<- interface{}, fn interface{}, args ...interface{}) {
 //	val := reflect.ValueOf(fn)
 //	argSlice := make([]reflect.Value, len(args))
 //	for i, arg := range args {

@@ -13,8 +13,8 @@ const BufferedChannelSize int64 = 20
 var wg sync.WaitGroup
 var mutex sync.Mutex
 
-//go:generate mockery --name=ExecutorService --output=./mocks --outpkg=mocks
-type ExecutorService interface {
+//go:generate mockery --name=Executor --output=./mocks --outpkg=mocks
+type Executor interface {
 	// Submit spawns new goroutine everytime this function is called.
 	// If you have large number of tasks use NewFixedWorkerPool instead
 	Submit(function interface{}, args ...interface{}) (*Future, error)
@@ -30,10 +30,10 @@ type Options struct {
 	BufferSize  int64
 }
 
-type ExecutorServiceImpl struct {
+type ExecutorService struct {
 }
 
-func (e *ExecutorServiceImpl) Submit(function interface{}, args ...interface{}) (*Future, error) {
+func (e *ExecutorService) Submit(function interface{}, args ...interface{}) (*Future, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 	resultChan := make(chan []interface{})
@@ -41,13 +41,13 @@ func (e *ExecutorServiceImpl) Submit(function interface{}, args ...interface{}) 
 	go func() {
 		err := task.Execute()
 		if err != nil {
-			log.Default().Println(fmt.Println(fmt.Sprintf("ExecutorService.Submit: execute task err: %v", err)))
+			log.Default().Println(fmt.Println(fmt.Sprintf("Executor.Submit: execute task err: %v", err)))
 		}
 	}()
 	return NewFuture(resultChan), nil
 }
 
-func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
+func (e *ExecutorService) NewFixedWorkerPool(options *Options) WorkerPool {
 	mutex.Lock()
 	defer mutex.Unlock()
 	options = GetOrDefaultWorkerPoolOptions(options)
@@ -65,8 +65,8 @@ func (e *ExecutorServiceImpl) NewFixedWorkerPool(options *Options) WorkerPool {
 }
 
 // NewExecutorService Creates new executorService
-func NewExecutorService() ExecutorService {
-	return &ExecutorServiceImpl{}
+func NewExecutorService() Executor {
+	return &ExecutorService{}
 }
 
 func GetOrDefaultWorkerPoolOptions(inputOptions *Options) *Options {

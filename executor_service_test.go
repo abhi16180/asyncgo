@@ -54,7 +54,7 @@ func TestExecutorServiceImpl_Submit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &ExecutorServiceImpl{}
+			e := &ExecutorService{}
 			got, _ := e.Submit(tt.args.function, tt.args.args...)
 			result, err := got.GetResult()
 			if tt.wantErr {
@@ -86,7 +86,7 @@ func TestExecutorServiceImpl_NewFixedWorkerPool(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &ExecutorServiceImpl{}
+			e := &ExecutorService{}
 			wp := e.NewFixedWorkerPool(tt.args.options)
 			assert.NotNil(t, wp, "NewFixedWorkerPool(%v)", tt.args.options)
 			wp.Terminate()
