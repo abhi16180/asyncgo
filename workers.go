@@ -76,18 +76,18 @@ func (w *WorkerPoolService) Terminate() {
 type Worker interface {
 }
 
-type WorkerImpl struct {
+type WorkerService struct {
 }
 
 // worker creates a new worker which processes tasks from tasks channel
 func worker(ctx context.Context, wg *sync.WaitGroup, tasks <-chan Task, id int64) {
 	defer wg.Done()
-	log.Println("New worker started")
+	log.Printf("worker %v started", id)
 	for {
 		select {
 		case task, ok := <-tasks:
 			if !ok {
-				log.Println("channel is closed, stopping the worker")
+				log.Printf("channel is closed, stopping worker %v", id)
 				return
 			}
 			log.Println(fmt.Sprintf("Worker %d received task", id))
@@ -95,7 +95,7 @@ func worker(ctx context.Context, wg *sync.WaitGroup, tasks <-chan Task, id int64
 				log.Println(fmt.Sprintf("Worker %d encountered error: %v", id, err))
 			}
 		case <-ctx.Done():
-			log.Println("Worker", id, "exiting - context canceled")
+			log.Println("worker", id, "exiting - context canceled")
 			return
 		default:
 			time.Sleep(1 * time.Second)
