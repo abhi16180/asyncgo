@@ -3,7 +3,6 @@ package quasar
 import (
 	"errors"
 	"log"
-	"time"
 )
 
 //go:generate mockery --name=TaskQueue --output=./mocks --outpkg=mocks
@@ -69,7 +68,6 @@ func (t *TaskQueueService) Process(options *Options) {
 			mutex.Unlock()
 		default:
 			if int64(len(*t.taskChannel)) >= options.BufferSize {
-				time.Sleep(1 * time.Millisecond)
 				continue
 			}
 			task := t.Pop()

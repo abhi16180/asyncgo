@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func TestExecutorServiceImpl_Submit(t *testing.T) {
@@ -92,4 +93,33 @@ func TestExecutorServiceImpl_NewFixedWorkerPool(t *testing.T) {
 			wp.ShutdownGracefully()
 		})
 	}
+}
+
+func TestWorkerPool(t *testing.T) {
+	executorService := NewExecutorService()
+	workerPool := executorService.NewFixedWorkerPool(&Options{
+		WorkerCount: 100,
+		BufferSize:  100,
+	})
+	multiply := func(a, b int) int {
+		time.Sleep(1000 * time.Millisecond)
+		return a * b
+	}
+	futures := make([]*Future, 0)
+	expectedSlice := make([]int, 0)
+	for i := 0; i < 100; i++ {
+		expected := i * (i + 1)
+		f, err := workerPool.Submit(multiply, i, i+1)
+		futures = append(futures, f)
+		expectedSlice = append(expectedSlice, expected)
+		if err != nil {
+			return
+		}
+	}
+	for i, future := range futures {
+		result, err := future.GetResult()
+		assert.Nil(t, err)
+		assert.Equal(t, result[0].(int), expectedSlice[i])
+	}
+	workerPool.ShutdownGracefully()
 }
