@@ -18,7 +18,7 @@ implementations for executing tasks.
     ```go
    
     package main
-    import "https://github.com/abhi16180/quasar.git"
+    import "github.com/abhi16180/quasar"
    
     ```
 
