@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-type S struct {
-	V int
+type myStruct struct {
+	Value int
 }
 
 func main() {
@@ -40,10 +40,10 @@ func main() {
 	fmt.Printf("Time cost %v\n", time.Now().Sub(now))
 }
 
-func testFunction() (S, int) {
+func testFunction() (myStruct, int) {
 	time.Sleep(2 * time.Second)
-	return S{
-		V: 1,
+	return myStruct{
+		Value: 1,
 	}, 10
 }
 
