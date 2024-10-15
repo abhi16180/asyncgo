@@ -23,7 +23,39 @@ implementations for executing tasks.
     ```
 
 
-## Example
+## Examples
+
+1. Creating executor service and executing tasks
+```go
+   // without worker pool, executorService.submit(task,args)
+   // will spawn new goroutine for each task
+   executorService := quasar.NewExecutorService()
+   future,err:=executorService.submit(...)
+   if err !=nil{
+	   // handle error
+   } else {
+	   fmt.Printf("result %v",future.GetResult())
+   }   
+
+```
+2. Using worker pool
+   ```go
+    executorService := quasar.NewExecutorService()
+	// set worker count and buffer size based on your needs
+	workerPool := executorService.NewFixedWorkerPool(&quasar.Options{
+		WorkerCount: 10,
+		BufferSize:  20,
+    })
+    future,err:=workerPool.Submit(task,arg1,arg2,..argN)
+    if err !=nil{
+	   // handle error
+    } else {
+	   fmt.Printf("result %v",future.GetResult())
+    }  
+```
+
+3. Complete example - workerpool
+
 
 ```go
 
@@ -49,7 +81,7 @@ func main() {
 		WorkerCount: 10,
 		BufferSize:  20,
 	})
-	
+	defer workerPool.ShutdownGracefully()
 	for i := 0; i < 10; i++ {
 		f, err := workerPool.Submit(testFunction,i,i+1)
 		if err != nil {
