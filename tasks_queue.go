@@ -19,17 +19,17 @@ type TaskQueue interface {
 }
 
 type TaskQueueService struct {
-	size           int
-	rejectNewTasks bool
-	tasks          []Task
-	taskChannel    *chan Task
-	shutDown       *chan interface{}
+	size                   int
+	shutDownSignalReceived bool
+	tasks                  []Task
+	taskChannel            *chan Task
+	shutDown               *chan interface{}
 }
 
 func (t *TaskQueueService) Push(task *Task) error {
 	mutex.Lock()
 	defer mutex.Unlock()
-	if t.rejectNewTasks {
+	if t.shutDownSignalReceived {
 		log.Println("cannot add new task after closing worker pool")
 		return errors.New("cannot add new task after closing worker pool")
 	}
@@ -47,7 +47,7 @@ func (t *TaskQueueService) Pop() *Task {
 		t.tasks = t.tasks[1:]
 		return &task
 	}
-	if t.rejectNewTasks {
+	if t.shutDownSignalReceived {
 		// if all tasks are completed and new tasks are rejected close the channel
 		log.Println("closing all workers")
 		close(*t.shutDown)
@@ -57,13 +57,14 @@ func (t *TaskQueueService) Pop() *Task {
 }
 
 func (t *TaskQueueService) Process(options *Options) {
+	defer wg.Done()
 	for {
 		select {
 		case _, ok := <-*t.shutDown:
 			mutex.Lock()
 			if ok {
-				log.Printf("shutting down task queue")
-				t.rejectNewTasks = true
+				log.Printf("shut down signal received - task queue")
+				t.shutDownSignalReceived = true
 			}
 			mutex.Unlock()
 		default:
@@ -73,6 +74,11 @@ func (t *TaskQueueService) Process(options *Options) {
 			task := t.Pop()
 			if task != nil {
 				*t.taskChannel <- *task
+			} else {
+				if t.shutDownSignalReceived {
+					log.Println("closing queue")
+					return
+				}
 			}
 		}
 	}

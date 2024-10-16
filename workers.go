@@ -81,8 +81,8 @@ type WorkerService struct {
 
 // worker creates a new worker which processes tasks from tasks channel
 func worker(ctx context.Context, wg *sync.WaitGroup, tasks <-chan Task, id int64) {
-	defer wg.Done()
 	log.Printf("worker %v started", id)
+	defer wg.Done()
 	for {
 		select {
 		case task, ok := <-tasks:

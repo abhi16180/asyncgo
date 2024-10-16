@@ -19,7 +19,7 @@ func main() {
 		WorkerCount: 10,
 		BufferSize:  20,
 	})
-	//workerPool.ShutdownGracefully()
+	defer workerPool.ShutdownGracefully()
 	for i := 0; i < 10; i++ {
 		f, err := workerPool.Submit(testFunction)
 		if err != nil {
@@ -28,7 +28,6 @@ func main() {
 			futures = append(futures, f)
 		}
 	}
-
 	for i, _ := range futures {
 		result, executionErr := futures[i].GetResult()
 		if executionErr != nil {
