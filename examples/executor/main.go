@@ -51,7 +51,7 @@ func main() {
 		log.Println(err)
 	}
 	fmt.Println(result1, result2, result3)
-	fmt.Println("time taken %v", time.Since(now))
+	fmt.Printf("time taken %v", time.Since(now))
 }
 
 func someLongTask(value int) int {
