@@ -1,4 +1,4 @@
-module github.com/abhi16180/quasar
+module github.com/abhi16180/asyncgo
 
 go 1.23
 

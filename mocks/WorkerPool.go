@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	quasar "github.com/abhi16180/quasar"
+	asyncgo "github.com/abhi16180/asyncgo"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -48,13 +48,13 @@ func (_m *WorkerPool) PoolSize() int64 {
 	return r0
 }
 
-// ShutdownGracefully provides a mock function with given fields:
+// Shutdown provides a mock function with given fields:
 func (_m *WorkerPool) Shutdown() {
 	_m.Called()
 }
 
 // Submit provides a mock function with given fields: function, args
-func (_m *WorkerPool) Submit(function interface{}, args ...interface{}) (*quasar.Future, error) {
+func (_m *WorkerPool) Submit(function interface{}, args ...interface{}) (*asyncgo.Future, error) {
 	var _ca []interface{}
 	_ca = append(_ca, function)
 	_ca = append(_ca, args...)
@@ -64,16 +64,16 @@ func (_m *WorkerPool) Submit(function interface{}, args ...interface{}) (*quasar
 		panic("no return value specified for Submit")
 	}
 
-	var r0 *quasar.Future
+	var r0 *asyncgo.Future
 	var r1 error
-	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) (*quasar.Future, error)); ok {
+	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) (*asyncgo.Future, error)); ok {
 		return rf(function, args...)
 	}
-	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) *quasar.Future); ok {
+	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) *asyncgo.Future); ok {
 		r0 = rf(function, args...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*quasar.Future)
+			r0 = ret.Get(0).(*asyncgo.Future)
 		}
 	}
 

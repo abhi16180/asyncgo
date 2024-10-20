@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	quasar "github.com/abhi16180/quasar"
+	asyncgo "github.com/abhi16180/asyncgo"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,19 +13,19 @@ type ExecutorService struct {
 }
 
 // NewFixedWorkerPool provides a mock function with given fields: options
-func (_m *ExecutorService) NewFixedWorkerPool(options *quasar.Options) quasar.WorkerPool {
+func (_m *ExecutorService) NewFixedWorkerPool(options *asyncgo.Options) asyncgo.WorkerPool {
 	ret := _m.Called(options)
 
 	if len(ret) == 0 {
 		panic("no return value specified for NewFixedWorkerPool")
 	}
 
-	var r0 quasar.WorkerPool
-	if rf, ok := ret.Get(0).(func(*quasar.Options) quasar.WorkerPool); ok {
+	var r0 asyncgo.WorkerPool
+	if rf, ok := ret.Get(0).(func(*asyncgo.Options) asyncgo.WorkerPool); ok {
 		r0 = rf(options)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(quasar.WorkerPool)
+			r0 = ret.Get(0).(asyncgo.WorkerPool)
 		}
 	}
 
@@ -33,7 +33,7 @@ func (_m *ExecutorService) NewFixedWorkerPool(options *quasar.Options) quasar.Wo
 }
 
 // Submit provides a mock function with given fields: function, args
-func (_m *ExecutorService) Submit(function interface{}, args ...interface{}) (*quasar.Future, error) {
+func (_m *ExecutorService) Submit(function interface{}, args ...interface{}) (*asyncgo.Future, error) {
 	var _ca []interface{}
 	_ca = append(_ca, function)
 	_ca = append(_ca, args...)
@@ -43,16 +43,16 @@ func (_m *ExecutorService) Submit(function interface{}, args ...interface{}) (*q
 		panic("no return value specified for Submit")
 	}
 
-	var r0 *quasar.Future
+	var r0 *asyncgo.Future
 	var r1 error
-	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) (*quasar.Future, error)); ok {
+	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) (*asyncgo.Future, error)); ok {
 		return rf(function, args...)
 	}
-	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) *quasar.Future); ok {
+	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) *asyncgo.Future); ok {
 		r0 = rf(function, args...)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*quasar.Future)
+			r0 = ret.Get(0).(*asyncgo.Future)
 		}
 	}
 

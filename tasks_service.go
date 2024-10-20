@@ -1,8 +1,8 @@
-package quasar
+package asyncgo
 
 import (
 	"fmt"
-	"github.com/abhi16180/quasar/utils"
+	"github.com/abhi16180/asyncgo/utils"
 	"reflect"
 )
 

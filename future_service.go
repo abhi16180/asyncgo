@@ -1,4 +1,4 @@
-package quasar
+package asyncgo
 
 type Future struct {
 	resultChan     <-chan []interface{}

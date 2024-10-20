@@ -1,4 +1,4 @@
-package quasar
+package asyncgo
 
 import (
 	"fmt"

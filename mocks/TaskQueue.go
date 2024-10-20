@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	quasar "github.com/abhi16180/quasar"
+	asyncgo "github.com/abhi16180/asyncgo"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,19 +13,19 @@ type TaskQueue struct {
 }
 
 // Pop provides a mock function with given fields:
-func (_m *TaskQueue) Pop() *quasar.Task {
+func (_m *TaskQueue) Pop() *asyncgo.Task {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for Pop")
 	}
 
-	var r0 *quasar.Task
-	if rf, ok := ret.Get(0).(func() *quasar.Task); ok {
+	var r0 *asyncgo.Task
+	if rf, ok := ret.Get(0).(func() *asyncgo.Task); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*quasar.Task)
+			r0 = ret.Get(0).(*asyncgo.Task)
 		}
 	}
 
@@ -33,12 +33,12 @@ func (_m *TaskQueue) Pop() *quasar.Task {
 }
 
 // Process provides a mock function with given fields: options
-func (_m *TaskQueue) Process(options *quasar.Options) {
+func (_m *TaskQueue) Process(options *asyncgo.Options) {
 	_m.Called(options)
 }
 
 // Push provides a mock function with given fields: task
-func (_m *TaskQueue) Push(task *quasar.Task) error {
+func (_m *TaskQueue) Push(task *asyncgo.Task) error {
 	ret := _m.Called(task)
 
 	if len(ret) == 0 {
@@ -46,7 +46,7 @@ func (_m *TaskQueue) Push(task *quasar.Task) error {
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*quasar.Task) error); ok {
+	if rf, ok := ret.Get(0).(func(*asyncgo.Task) error); ok {
 		r0 = rf(task)
 	} else {
 		r0 = ret.Error(0)

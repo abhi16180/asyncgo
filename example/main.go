@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/abhi16180/quasar"
+	"github.com/abhi16180/asyncgo"
 	"log"
 	"time"
 )
@@ -12,10 +12,10 @@ type myStruct struct {
 }
 
 func main() {
-	futures := make([]*quasar.Future, 0)
+	futures := make([]*asyncgo.Future, 0)
 	now := time.Now()
-	executor := quasar.NewExecutor()
-	workerPool := executor.NewFixedWorkerPool(&quasar.Options{
+	executor := asyncgo.NewExecutor()
+	workerPool := executor.NewFixedWorkerPool(&asyncgo.Options{
 		WorkerCount: 10,
 		BufferSize:  20,
 	})
@@ -41,49 +41,3 @@ func testFunction() (myStruct, int) {
 		Value: 1,
 	}, 10
 }
-
-//type Executor struct {
-//}
-//
-//func NewExecutor() *Executor {
-//	return &Executor{}
-//}
-//
-//func (e *Executor) Submit(fn interface{}, args ...interface{}) (*Future, error) {
-//	if reflect.TypeOf(fn).Kind() != reflect.Func {
-//		return nil, fmt.Errorf("fn must be a function")
-//	}
-//	ch := make(chan interface{})
-//	if len(args) > 0 {
-//		go e.run(ch, fn, args)
-//	} else {
-//		go e.run(ch, fn)
-//	}
-//	return NewFuture(ch), nil
-//}
-//
-//func (e *Executor) run(ch chan<- interface{}, fn interface{}, args ...interface{}) {
-//	val := reflect.ValueOf(fn)
-//	argSlice := make([]reflect.Value, len(args))
-//	for i, arg := range args {
-//		argSlice[i] = reflect.ValueOf(arg)
-//	}
-//	if len(argSlice) > 0 {
-//		result := val.Call(argSlice)
-//		ch <- result
-//	}
-//	ch <- nil
-//}
-//
-//type Future struct {
-//	resultChan <-chan interface{}
-//}
-//
-//func NewFuture(ch <-chan interface{}) *Future {
-//	return &Future{
-//		resultChan: ch,
-//	}
-//}
-//func (f *Future) Get() interface{} {
-//	return <-f.resultChan
-//}

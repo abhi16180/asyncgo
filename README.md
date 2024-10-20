@@ -1,13 +1,13 @@
-# quasar
+# asyncgo
 
-Quasar is a concurrent task executor designed for simplicity and performance. Quasar API is similar to
-`ExecutorService` in Java. Quasar abstracts manual handling of goroutines and provides easy to use highly performant
+asyncgo is a concurrent task executor designed for simplicity and performance. asyncgo API is similar to
+`ExecutorService` in Java. asyncgo abstracts manual handling of goroutines and provides easy to use highly performant
 implementations for executing tasks. 
 
 ## Features
 
 - **Task Management**: Handles and executes tasks concurrently.
-- **Asynchronous processing**: Quasar provides non-blocking methods to submit and execute any go functions
+- **Asynchronous processing**: asyncgo provides non-blocking methods to submit and execute any go functions
 - **Graceful Shutdown**: Guarantees ongoing tasks are completed before shutting down.
 - **Configurable Concurrency**: Allows setting the number of workers to control concurrent task execution.
 
@@ -18,7 +18,7 @@ implementations for executing tasks.
     ```go
    
     package main
-    import "github.com/abhi16180/quasar"
+    import "github.com/abhi16180/asyncgo"
    
     ```
 
@@ -30,7 +30,7 @@ implementations for executing tasks.
 ```go
    // without worker pool, executorService.submit(task,args)
    // will spawn new goroutine for each task
-   executorService := quasar.NewExecutorService()
+   executorService := asyncgo.NewExecutorService()
    future,err:=executorService.submit(...)
    if err !=nil{
 	   // handle error
@@ -43,9 +43,9 @@ implementations for executing tasks.
 
 ```go
 
-   executorService := quasar.NewExecutorService()
+   executorService := asyncgo.NewExecutorService()
    // set worker count and buffer size based on your needs
-   workerPool := executorService.NewFixedWorkerPool(&quasar.Options{
+   workerPool := executorService.NewFixedWorkerPool(&asyncgo.Options{
        WorkerCount: 10,
        BufferSize:  20,
    })
@@ -66,7 +66,7 @@ implementations for executing tasks.
    
    import (
        "fmt"
-       "github.com/abhi16180/quasar"
+       "github.com/abhi16180/asyncgo"
        "log"
        "time"
    )
@@ -76,11 +76,11 @@ implementations for executing tasks.
    }
    
    func main() {
-       futures := make([]*quasar.Future, 0)
+       futures := make([]*asyncgo.Future, 0)
        now := time.Now()
-       executorService := quasar.NewExecutorService()
+       executorService := asyncgo.NewExecutorService()
        // set worker count and buffer size based on your needs
-       workerPool := executorService.NewFixedWorkerPool(&quasar.Options{
+       workerPool := executorService.NewFixedWorkerPool(&asyncgo.Options{
            WorkerCount: 10,
            BufferSize:  20,
        })
