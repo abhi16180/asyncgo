@@ -96,7 +96,7 @@ func TestExecutorServiceImpl_NewFixedWorkerPool(t *testing.T) {
 	}
 }
 
-func TestWorkerPool(t *testing.T) {
+func TestWorkerPool1(t *testing.T) {
 	executorService := NewExecutor()
 	workerPool := executorService.NewFixedWorkerPool(context.TODO(), &Options{
 		WorkerCount: 100,
@@ -123,4 +123,68 @@ func TestWorkerPool(t *testing.T) {
 		assert.Equal(t, result[0].(int), expectedSlice[i])
 	}
 	workerPool.Shutdown()
+}
+
+func TestWorkerPoolEnsureGracefulShutdown(t *testing.T) {
+	executorService := NewExecutor()
+	workerPool := executorService.NewFixedWorkerPool(context.TODO(), &Options{
+		WorkerCount: 100,
+		BufferSize:  100,
+	})
+	multiply := func(a, b int) int {
+		time.Sleep(time.Second)
+		return a * b
+	}
+	futures := make([]*Future, 0)
+	expectedSlice := make([]int, 0)
+	for i := 0; i < 100; i++ {
+		expected := i * (i + 1)
+		f, err := workerPool.Submit(multiply, i, i+1)
+		futures = append(futures, f)
+		expectedSlice = append(expectedSlice, expected)
+		if err != nil {
+			return
+		}
+	}
+	// even though shutdown is called even before retrieving results, it should not cancel the existing tasks
+	// all the submitted tasks' execution should be guaranteed.
+	workerPool.Shutdown()
+	for i, future := range futures {
+		result, err := future.Get()
+		assert.Nil(t, err)
+		assert.Equal(t, result[0].(int), expectedSlice[i])
+	}
+}
+
+func TestWorkerPoolSubmitTaskAfterShutdown(t *testing.T) {
+	executorService := NewExecutor()
+	workerPool := executorService.NewFixedWorkerPool(context.TODO(), nil)
+	multiply := func(a, b int) int {
+		time.Sleep(time.Second)
+		return a * b
+	}
+	futures := make([]*Future, 0)
+	expectedSlice := make([]int, 0)
+	for i := 0; i < 10; i++ {
+		expected := i * (i + 1)
+		f, err := workerPool.Submit(multiply, i, i+1)
+		futures = append(futures, f)
+		expectedSlice = append(expectedSlice, expected)
+		if err != nil {
+			return
+		}
+	}
+	workerPool.Shutdown()
+	for i, future := range futures {
+		result, err := future.Get()
+		assert.Nil(t, err)
+		assert.Equal(t, result[0].(int), expectedSlice[i])
+	}
+	f, err := workerPool.Submit(func() int {
+		time.Sleep(time.Second)
+		return 10
+	})
+	assert.Nil(t, f)
+	assert.Equal(t, fmt.Errorf("cannot add new task after closing worker pool"), err)
+
 }

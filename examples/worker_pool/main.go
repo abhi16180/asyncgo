@@ -34,6 +34,8 @@ func main() {
 		}
 		log.Println("result", result)
 	}
+	// gracefully shutdown all the workers
+	workerPool.Shutdown()
 	log.Printf("total time taken %v", time.Since(now))
 }
 
