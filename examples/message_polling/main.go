@@ -17,7 +17,7 @@ func main() {
 	})
 
 	defer workerPool.Shutdown()
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, _ := context.WithCancel(context.Background())
 	for i := 0; i < 10; i++ {
 		_, err := workerPool.Submit(receiveMessage, ctx)
 		if err != nil {
@@ -25,7 +25,7 @@ func main() {
 		}
 	}
 	// remove this if you want to run indefinitely
-	go stopAfterSometime(cancel)
+	//go stopAfterSometime(cancel)
 
 	// waits until all futures are done executing
 	// in this case this will run 10 seconds

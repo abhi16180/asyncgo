@@ -3,6 +3,7 @@ package asyncgo
 import (
 	"errors"
 	"log"
+	"time"
 )
 
 //go:generate mockery --name=TaskQueue --output=./mocks --outpkg=mocks
@@ -78,6 +79,8 @@ func (t *TaskQueueService) Process(options *Options) {
 				if t.shutDownSignalReceived {
 					log.Println("closing queue")
 					return
+				} else {
+					time.Sleep(options.IdleSleepDuration)
 				}
 			}
 		}

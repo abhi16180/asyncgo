@@ -6,6 +6,7 @@ import (
 	"log"
 	"runtime"
 	"sync"
+	"time"
 )
 
 const BufferedChannelSize int64 = 20
@@ -26,8 +27,14 @@ type Executor interface {
 }
 
 type Options struct {
+	// WorkerCount - number of goroutines
 	WorkerCount int64
-	BufferSize  int64
+	// BufferSize is size of buffered channel
+	BufferSize int64
+	// IdleSleepDuration is needed to specify sleep duration if not new tasks is added to queue.
+	// It is required to prevent unnecessary wasting of CPU cycles.
+	// Default value will be set as 10ms
+	IdleSleepDuration time.Duration
 }
 
 type ExecutorService struct {
@@ -77,6 +84,9 @@ func GetOrDefaultWorkerPoolOptions(inputOptions *Options) *Options {
 		}
 		if inputOptions.BufferSize == 0 {
 			inputOptions.BufferSize = BufferedChannelSize
+		}
+		if inputOptions.IdleSleepDuration == 0 {
+			inputOptions.IdleSleepDuration = time.Millisecond * 10
 		}
 		return inputOptions
 	}
