@@ -48,12 +48,13 @@ func NewWorkerPool(taskQueue TaskQueue, taskChan *chan Task, wg *sync.WaitGroup,
 
 func (w *WorkerPoolService) Submit(function interface{}, args ...interface{}) (*Future, error) {
 	resultChan := make(chan []interface{})
-	task := NewTask(resultChan, function, args)
+	errChan := make(chan error)
+	task := NewTask(resultChan, errChan, function, args)
 	err := w.taskQueue.Push(&task)
 	if err != nil {
 		return nil, err
 	}
-	return NewFuture(resultChan), nil
+	return NewFuture(resultChan, errChan), nil
 }
 
 func (w *WorkerPoolService) PoolSize() int64 {

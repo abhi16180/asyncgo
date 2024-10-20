@@ -14,13 +14,15 @@ type Task interface {
 
 type TaskService struct {
 	resultChannel chan<- []interface{}
+	errChan       chan<- error
 	function      interface{}
 	args          []interface{}
 }
 
-func NewTask(resultChan chan<- []interface{}, function interface{}, args []interface{}) Task {
+func NewTask(resultChan chan<- []interface{}, errChannel chan<- error, function interface{}, args []interface{}) Task {
 	return &TaskService{
 		resultChannel: resultChan,
+		errChan:       errChannel,
 		function:      function,
 		args:          args,
 	}
@@ -30,12 +32,14 @@ func (t *TaskService) Execute() error {
 	val := reflect.ValueOf(t.function)
 	kind := val.Kind()
 	if kind != reflect.Func {
-		t.resultChannel <- []interface{}{fmt.Errorf("function must be a function")}
+		t.resultChannel <- nil
+		t.errChan <- fmt.Errorf("function must be a function")
 		return fmt.Errorf("function must be a function")
 	}
 	numIn := val.Type().NumIn()
 	if numIn != len(t.args) {
-		t.resultChannel <- []interface{}{fmt.Errorf("function must have %d parameters", numIn)}
+		t.resultChannel <- nil
+		t.errChan <- fmt.Errorf("function must have %d parameters", numIn)
 		return fmt.Errorf("function must have %d parameters", numIn)
 	}
 	argSlice := make([]reflect.Value, len(t.args))
@@ -49,5 +53,6 @@ func (t *TaskService) Execute() error {
 		result = val.Call([]reflect.Value{})
 	}
 	t.resultChannel <- utils.GetResultInterface(result)
+	t.errChan <- nil
 	return nil
 }

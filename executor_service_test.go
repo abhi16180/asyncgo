@@ -1,6 +1,7 @@
 package asyncgo
 
 import (
+	"context"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -17,7 +18,7 @@ func TestExecutorServiceImpl_Submit(t *testing.T) {
 		args    args
 		want    []interface{}
 		wantErr bool
-		err     []interface{}
+		err     error
 	}{
 		{
 			name: "success",
@@ -38,7 +39,7 @@ func TestExecutorServiceImpl_Submit(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: true,
-			err:     []interface{}{fmt.Errorf("function must be a function")},
+			err:     fmt.Errorf("function must be a function"),
 		},
 		{
 			name: "fails due to invalid args",
@@ -50,16 +51,16 @@ func TestExecutorServiceImpl_Submit(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: true,
-			err:     []interface{}{fmt.Errorf("function must have %d parameters", 2)},
+			err:     fmt.Errorf("function must have %d parameters", 2),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &ExecutorService{}
-			got, _ := e.Submit(tt.args.function, tt.args.args...)
-			result := got.GetResult()
+			got := e.Submit(tt.args.function, tt.args.args...)
+			result, err := got.Get()
 			if tt.wantErr {
-				assert.Equal(t, tt.err, result)
+				assert.Equal(t, tt.err, err)
 			} else {
 				assert.Equal(t, tt.want, result)
 			}
@@ -88,7 +89,7 @@ func TestExecutorServiceImpl_NewFixedWorkerPool(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &ExecutorService{}
-			wp := e.NewFixedWorkerPool(tt.args.options)
+			wp := e.NewFixedWorkerPool(context.Background(), tt.args.options)
 			assert.NotNil(t, wp, "NewFixedWorkerPool(%v)", tt.args.options)
 			wp.Shutdown()
 		})
@@ -97,12 +98,12 @@ func TestExecutorServiceImpl_NewFixedWorkerPool(t *testing.T) {
 
 func TestWorkerPool(t *testing.T) {
 	executorService := NewExecutor()
-	workerPool := executorService.NewFixedWorkerPool(&Options{
+	workerPool := executorService.NewFixedWorkerPool(context.TODO(), &Options{
 		WorkerCount: 100,
 		BufferSize:  100,
 	})
 	multiply := func(a, b int) int {
-		time.Sleep(1000 * time.Millisecond)
+		time.Sleep(time.Second)
 		return a * b
 	}
 	futures := make([]*Future, 0)
@@ -117,7 +118,8 @@ func TestWorkerPool(t *testing.T) {
 		}
 	}
 	for i, future := range futures {
-		result := future.GetResult()
+		result, err := future.Get()
+		assert.Nil(t, err)
 		assert.Equal(t, result[0].(int), expectedSlice[i])
 	}
 	workerPool.Shutdown()

@@ -17,11 +17,11 @@ var mutex sync.Mutex
 type Executor interface {
 	// Submit spawns new goroutine everytime this function is called.
 	// If you have large number of tasks use NewFixedWorkerPool instead
-	Submit(function interface{}, args ...interface{}) (*Future, error)
+	Submit(function interface{}, args ...interface{}) *Future
 	// NewFixedWorkerPool creates pool of workers with given options. Spawns separate go-routine for queue processor
 	// *Note* - If you are not sure about bufferSize, do not set it explicitly.
 	// Default bufferSize will be set to BufferedChannelSize
-	NewFixedWorkerPool(options *Options) WorkerPool
+	NewFixedWorkerPool(ctx context.Context, options *Options) WorkerPool
 	// pushToQueue adds task to task queue associated with the worker pool
 }
 
@@ -33,25 +33,26 @@ type Options struct {
 type ExecutorService struct {
 }
 
-func (e *ExecutorService) Submit(function interface{}, args ...interface{}) (*Future, error) {
+func (e *ExecutorService) Submit(function interface{}, args ...interface{}) *Future {
 	mutex.Lock()
 	defer mutex.Unlock()
 	resultChan := make(chan []interface{})
-	task := NewTask(resultChan, function, args)
+	errChan := make(chan error)
+	task := NewTask(resultChan, errChan, function, args)
 	go func() {
 		err := task.Execute()
 		if err != nil {
 			log.Default().Println(fmt.Println(fmt.Sprintf("Executor.Submit: execute task err: %v", err)))
 		}
 	}()
-	return NewFuture(resultChan), nil
+	return NewFuture(resultChan, errChan)
 }
 
-func (e *ExecutorService) NewFixedWorkerPool(options *Options) WorkerPool {
+func (e *ExecutorService) NewFixedWorkerPool(ctx context.Context, options *Options) WorkerPool {
 	mutex.Lock()
 	defer mutex.Unlock()
 	options = GetOrDefaultWorkerPoolOptions(options)
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(ctx)
 	taskChan := make(chan Task, options.BufferSize)
 	shutDown := make(chan interface{})
 	taskQueue := NewTaskQueue(&taskChan, &shutDown)

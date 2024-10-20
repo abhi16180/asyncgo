@@ -3,7 +3,10 @@
 package mocks
 
 import (
+	context "context"
+
 	asyncgo "github.com/abhi16180/asyncgo"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -12,17 +15,17 @@ type Executor struct {
 	mock.Mock
 }
 
-// NewFixedWorkerPool provides a mock function with given fields: options
-func (_m *Executor) NewFixedWorkerPool(options *asyncgo.Options) asyncgo.WorkerPool {
-	ret := _m.Called(options)
+// NewFixedWorkerPool provides a mock function with given fields: ctx, options
+func (_m *Executor) NewFixedWorkerPool(ctx context.Context, options *asyncgo.Options) asyncgo.WorkerPool {
+	ret := _m.Called(ctx, options)
 
 	if len(ret) == 0 {
 		panic("no return value specified for NewFixedWorkerPool")
 	}
 
 	var r0 asyncgo.WorkerPool
-	if rf, ok := ret.Get(0).(func(*asyncgo.Options) asyncgo.WorkerPool); ok {
-		r0 = rf(options)
+	if rf, ok := ret.Get(0).(func(context.Context, *asyncgo.Options) asyncgo.WorkerPool); ok {
+		r0 = rf(ctx, options)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(asyncgo.WorkerPool)
@@ -33,7 +36,7 @@ func (_m *Executor) NewFixedWorkerPool(options *asyncgo.Options) asyncgo.WorkerP
 }
 
 // Submit provides a mock function with given fields: function, args
-func (_m *Executor) Submit(function interface{}, args ...interface{}) (*asyncgo.Future, error) {
+func (_m *Executor) Submit(function interface{}, args ...interface{}) *asyncgo.Future {
 	var _ca []interface{}
 	_ca = append(_ca, function)
 	_ca = append(_ca, args...)
@@ -44,10 +47,6 @@ func (_m *Executor) Submit(function interface{}, args ...interface{}) (*asyncgo.
 	}
 
 	var r0 *asyncgo.Future
-	var r1 error
-	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) (*asyncgo.Future, error)); ok {
-		return rf(function, args...)
-	}
 	if rf, ok := ret.Get(0).(func(interface{}, ...interface{}) *asyncgo.Future); ok {
 		r0 = rf(function, args...)
 	} else {
@@ -56,13 +55,7 @@ func (_m *Executor) Submit(function interface{}, args ...interface{}) (*asyncgo.
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(interface{}, ...interface{}) error); ok {
-		r1 = rf(function, args...)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewExecutor creates a new instance of Executor. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
