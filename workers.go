@@ -21,7 +21,7 @@ type WorkerPool interface {
 	// ShutdownGracefully -  guarantees all existing tasks will be executed.
 	// No new task(s) will be added to the task queue.
 	// Trying to Submit new task will return an error
-	ShutdownGracefully()
+	Shutdown()
 	// Terminate terminates all the workers in worker pool - this is not graceful shutdown
 	// Any existing task might not run if this method is called in the middle
 	Terminate()
@@ -64,7 +64,7 @@ func (w *WorkerPoolService) ChannelBufferSize() int64 {
 	return w.options.BufferSize
 }
 
-func (w *WorkerPoolService) ShutdownGracefully() {
+func (w *WorkerPoolService) Shutdown() {
 	*w.shutDown <- true
 }
 

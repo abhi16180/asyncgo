@@ -12,13 +12,7 @@ func NewFuture(resultChannel <-chan []interface{}) *Future {
 	}
 }
 
-func (f *Future) GetResult() ([]interface{}, error) {
+func (f *Future) GetResult() []interface{} {
 	f.result = <-f.resultChan
-	if len(f.result) == 1 {
-		switch v := f.result[0].(type) {
-		case error:
-			f.executionError = v
-		}
-	}
-	return f.result, f.executionError
+	return f.result
 }

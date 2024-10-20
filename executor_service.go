@@ -64,8 +64,8 @@ func (e *ExecutorService) NewFixedWorkerPool(options *Options) WorkerPool {
 	return NewWorkerPool(taskQueue, &taskChan, &wg, cancel, &shutDown)
 }
 
-// NewExecutorService Creates new executorService
-func NewExecutorService() Executor {
+// NewExecutor Creates new executorService
+func NewExecutor() Executor {
 	return &ExecutorService{}
 }
 

@@ -49,7 +49,7 @@ func (_m *WorkerPool) PoolSize() int64 {
 }
 
 // ShutdownGracefully provides a mock function with given fields:
-func (_m *WorkerPool) ShutdownGracefully() {
+func (_m *WorkerPool) Shutdown() {
 	_m.Called()
 }
 

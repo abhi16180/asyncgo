@@ -17,7 +17,7 @@ func TestExecutorServiceImpl_Submit(t *testing.T) {
 		args    args
 		want    []interface{}
 		wantErr bool
-		err     error
+		err     []interface{}
 	}{
 		{
 			name: "success",
@@ -38,7 +38,7 @@ func TestExecutorServiceImpl_Submit(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: true,
-			err:     fmt.Errorf("function must be a function"),
+			err:     []interface{}{fmt.Errorf("function must be a function")},
 		},
 		{
 			name: "fails due to invalid args",
@@ -50,16 +50,16 @@ func TestExecutorServiceImpl_Submit(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: true,
-			err:     fmt.Errorf("function must have %d parameters", 2),
+			err:     []interface{}{fmt.Errorf("function must have %d parameters", 2)},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &ExecutorService{}
 			got, _ := e.Submit(tt.args.function, tt.args.args...)
-			result, err := got.GetResult()
+			result := got.GetResult()
 			if tt.wantErr {
-				assert.Equal(t, tt.err, err)
+				assert.Equal(t, tt.err, result)
 			} else {
 				assert.Equal(t, tt.want, result)
 			}
@@ -90,13 +90,13 @@ func TestExecutorServiceImpl_NewFixedWorkerPool(t *testing.T) {
 			e := &ExecutorService{}
 			wp := e.NewFixedWorkerPool(tt.args.options)
 			assert.NotNil(t, wp, "NewFixedWorkerPool(%v)", tt.args.options)
-			wp.ShutdownGracefully()
+			wp.Shutdown()
 		})
 	}
 }
 
 func TestWorkerPool(t *testing.T) {
-	executorService := NewExecutorService()
+	executorService := NewExecutor()
 	workerPool := executorService.NewFixedWorkerPool(&Options{
 		WorkerCount: 100,
 		BufferSize:  100,
@@ -117,9 +117,8 @@ func TestWorkerPool(t *testing.T) {
 		}
 	}
 	for i, future := range futures {
-		result, err := future.GetResult()
-		assert.Nil(t, err)
+		result := future.GetResult()
 		assert.Equal(t, result[0].(int), expectedSlice[i])
 	}
-	workerPool.ShutdownGracefully()
+	workerPool.Shutdown()
 }

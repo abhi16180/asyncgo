@@ -14,12 +14,12 @@ type myStruct struct {
 func main() {
 	futures := make([]*quasar.Future, 0)
 	now := time.Now()
-	executorService := quasar.NewExecutorService()
-	workerPool := executorService.NewFixedWorkerPool(&quasar.Options{
+	executor := quasar.NewExecutor()
+	workerPool := executor.NewFixedWorkerPool(&quasar.Options{
 		WorkerCount: 10,
 		BufferSize:  20,
 	})
-	defer workerPool.ShutdownGracefully()
+	defer workerPool.Shutdown()
 	for i := 0; i < 10; i++ {
 		f, err := workerPool.Submit(testFunction)
 		if err != nil {
@@ -28,12 +28,8 @@ func main() {
 			futures = append(futures, f)
 		}
 	}
-	for i, _ := range futures {
-		result, executionErr := futures[i].GetResult()
-		if executionErr != nil {
-			fmt.Println(executionErr)
-			continue
-		}
+	for i := range futures {
+		result := futures[i].GetResult()
 		fmt.Println(result)
 	}
 	fmt.Printf("Time cost %v\n", time.Now().Sub(now))
@@ -49,7 +45,7 @@ func testFunction() (myStruct, int) {
 //type Executor struct {
 //}
 //
-//func NewExecutorService() *Executor {
+//func NewExecutor() *Executor {
 //	return &Executor{}
 //}
 //
