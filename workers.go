@@ -18,19 +18,22 @@ type WorkerPool interface {
 	PoolSize() int64
 	// ChannelBufferSize returns the current channel buffer size
 	ChannelBufferSize() int64
-	// ShutdownGracefully -  guarantees all existing tasks will be executed.
+	// Shutdown guarantees all existing tasks will be executed.
 	// No new task(s) will be added to the task queue.
 	// Trying to Submit new task will return an error
 	Shutdown()
 	// Terminate terminates all the workers in worker pool - this is not graceful shutdown
 	// Any existing task might not run if this method is called in the middle
 	Terminate()
+	// WaitAll waits until all futures done executing
+	WaitAll() error
 }
 
 type WorkerPoolService struct {
 	options   *Options
 	taskChan  *chan Task
 	shutDown  *chan interface{}
+	futures   *[]Future
 	wg        *sync.WaitGroup
 	Cancel    context.CancelFunc
 	taskQueue TaskQueue
@@ -43,6 +46,7 @@ func NewWorkerPool(taskQueue TaskQueue, taskChan *chan Task, wg *sync.WaitGroup,
 		Cancel:    cancel,
 		taskQueue: taskQueue,
 		shutDown:  shutDown,
+		futures:   &[]Future{},
 	}
 }
 
@@ -54,7 +58,9 @@ func (w *WorkerPoolService) Submit(function interface{}, args ...interface{}) (*
 	if err != nil {
 		return nil, err
 	}
-	return NewFuture(resultChan, errChan), nil
+	f := NewFuture(resultChan, errChan)
+	*w.futures = append(*w.futures, *f)
+	return f, nil
 }
 
 func (w *WorkerPoolService) PoolSize() int64 {
@@ -71,6 +77,17 @@ func (w *WorkerPoolService) Shutdown() {
 
 func (w *WorkerPoolService) Terminate() {
 	w.Cancel()
+}
+
+func (w *WorkerPoolService) WaitAll() error {
+	for _, future := range *w.futures {
+		err := future.Wait()
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+	}
+	return nil
 }
 
 //go:generate mockery --name=Worker --output=./mocks --outpkg=mocks

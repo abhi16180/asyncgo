@@ -20,3 +20,10 @@ func (f *Future) Get() ([]interface{}, error) {
 	f.err = <-f.errChan
 	return f.result, f.err
 }
+
+func (f *Future) Wait() error {
+	_, err := f.Get()
+	return err
+}
+
+// wait all futures
