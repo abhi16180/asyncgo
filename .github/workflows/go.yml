@@ -24,3 +24,6 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+
+    - name: release
+      run: gh release create v0.0.1 --title "v0.0.1 (nightly)" --notes "this is a test release"
