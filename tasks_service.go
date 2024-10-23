@@ -33,8 +33,8 @@ func (t *TaskService) Execute() error {
 	kind := val.Kind()
 	if kind != reflect.Func {
 		t.resultChannel <- nil
-		t.errChan <- fmt.Errorf("function must be a function")
-		return fmt.Errorf("function must be a function")
+		t.errChan <- fmt.Errorf("parameter 'function' must be a function")
+		return fmt.Errorf("parameter 'function' must be a function")
 	}
 	numIn := val.Type().NumIn()
 	if numIn != len(t.args) {
