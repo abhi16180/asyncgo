@@ -39,7 +39,7 @@ func TestExecutorServiceImpl_Submit(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: true,
-			err:     fmt.Errorf("function must be a function"),
+			err:     fmt.Errorf("parameter 'function' must be a function"),
 		},
 		{
 			name: "fails due to invalid args",
