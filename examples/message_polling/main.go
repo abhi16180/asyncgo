@@ -10,27 +10,32 @@ import (
 
 func main() {
 	executor := asyncgo.NewExecutor()
+
 	// set worker count and buffer size according to your needs
 	workerPool := executor.NewFixedWorkerPool(context.TODO(), &asyncgo.Options{
 		WorkerCount: 10,
 		BufferSize:  10,
 	})
 
+	// call this method to close workers gracefully
 	defer workerPool.Shutdown()
+
 	ctx, _ := context.WithCancel(context.Background())
+
 	for i := 0; i < 10; i++ {
 		_, err := workerPool.Submit(receiveMessage, ctx)
 		if err != nil {
 			return
 		}
 	}
-	// remove this if you want to run indefinitely
-	//go stopAfterSometime(cancel)
 
-	// waits until all futures are done executing
-	// in this case this will run 10 seconds
+	// stopAfterSometime() is needed to stop polling after given duration
+	// needs to be commented if infinite polling is needed
+
+	// WaitAll waits until all futures are done executing
 	// To run indefinitely just remove stopAfterSometime function
 	// You can use this for services like SQS to continuously poll for new messages
+
 	err := workerPool.WaitAll()
 	if err != nil {
 		log.Println(err)
@@ -44,13 +49,13 @@ func receiveMessage(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		default:
-			result := mockProviderService()
+			result := mockSQS()
 			process(result)
 		}
 	}
 }
 
-func mockProviderService() []int {
+func mockSQS() []int {
 	time.Sleep(100 * time.Millisecond)
 	var result []int
 	for i := 0; i < 100; i++ {
