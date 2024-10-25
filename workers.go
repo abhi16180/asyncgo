@@ -38,10 +38,10 @@ type WorkerPoolService struct {
 	futures   *[]Future
 	wg        *sync.WaitGroup
 	Cancel    context.CancelFunc
-	taskQueue internal.TaskQueue
+	taskQueue internal.Queue
 }
 
-func NewWorkerPool(taskQueue internal.TaskQueue, taskChan *chan internal.Task, wg *sync.WaitGroup, cancel context.CancelFunc, shutDown *chan interface{}) WorkerPool {
+func NewWorkerPool(taskQueue internal.Queue, taskChan *chan internal.Task, wg *sync.WaitGroup, cancel context.CancelFunc, shutDown *chan interface{}) WorkerPool {
 	return &WorkerPoolService{
 		taskChan:  taskChan,
 		wg:        wg,

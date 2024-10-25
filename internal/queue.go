@@ -8,22 +8,22 @@ import (
 	"time"
 )
 
-//go:generate mockery --name=TaskQueue --output=../mocks --outpkg=mocks
-type TaskQueue interface {
-	// Push pushes task to TaskQueue
+//go:generate mockery --name=Queue --output=../mocks --outpkg=mocks
+type Queue interface {
+	// Push pushes task to Queue
 	Push(task *Task) error
 	// Pop removes the first item from the queue and returns the pointer to it.
 	// If item does not exist, returns nil
 	Pop() *Task
 	// Process continuously checks the buffered channel's size.
-	// If the buffered channel is not full, pops tasks from TaskQueue
+	// If the buffered channel is not full, pops tasks from Queue
 	// and sends to tasks channel
 	Process(wg *sync.WaitGroup, options *commons.Options)
 }
 
 var mutex sync.Mutex
 
-type TaskQueueService struct {
+type QueueService struct {
 	size                   int
 	shutDownSignalReceived bool
 	tasks                  []Task
@@ -31,7 +31,7 @@ type TaskQueueService struct {
 	shutDown               *chan interface{}
 }
 
-func (t *TaskQueueService) Push(task *Task) error {
+func (t *QueueService) Push(task *Task) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 	if t.shutDownSignalReceived {
@@ -43,7 +43,7 @@ func (t *TaskQueueService) Push(task *Task) error {
 	return nil
 }
 
-func (t *TaskQueueService) Pop() *Task {
+func (t *QueueService) Pop() *Task {
 	mutex.Lock()
 	defer mutex.Unlock()
 	if t.size > 0 {
@@ -61,7 +61,7 @@ func (t *TaskQueueService) Pop() *Task {
 	return nil
 }
 
-func (t *TaskQueueService) Process(wg *sync.WaitGroup, options *commons.Options) {
+func (t *QueueService) Process(wg *sync.WaitGroup, options *commons.Options) {
 	defer wg.Done()
 	for {
 		select {
@@ -91,8 +91,8 @@ func (t *TaskQueueService) Process(wg *sync.WaitGroup, options *commons.Options)
 	}
 }
 
-func NewTaskQueue(taskChan *chan Task, shutDown *chan interface{}) TaskQueue {
-	return &TaskQueueService{
+func NewTaskQueue(taskChan *chan Task, shutDown *chan interface{}) Queue {
+	return &QueueService{
 		taskChannel: taskChan,
 		shutDown:    shutDown,
 	}
