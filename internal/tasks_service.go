@@ -1,4 +1,4 @@
-package asyncgo
+package internal
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"reflect"
 )
 
-//go:generate mockery --name=Task --output=./mocks --outpkg=mocks
+//go:generate mockery --name=Task --output=../mocks --outpkg=mocks
 type Task interface {
 	// Execute gets the function signature using reflection. Calls the function
 	Execute() error

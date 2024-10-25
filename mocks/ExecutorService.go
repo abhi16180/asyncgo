@@ -4,6 +4,7 @@ package mocks
 
 import (
 	asyncgo "github.com/abhi16180/asyncgo"
+	"github.com/abhi16180/asyncgo/commons"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,7 +14,7 @@ type ExecutorService struct {
 }
 
 // NewFixedWorkerPool provides a mock function with given fields: options
-func (_m *ExecutorService) NewFixedWorkerPool(options *asyncgo.Options) asyncgo.WorkerPool {
+func (_m *ExecutorService) NewFixedWorkerPool(options *commons.Options) asyncgo.WorkerPool {
 	ret := _m.Called(options)
 
 	if len(ret) == 0 {
@@ -21,7 +22,7 @@ func (_m *ExecutorService) NewFixedWorkerPool(options *asyncgo.Options) asyncgo.
 	}
 
 	var r0 asyncgo.WorkerPool
-	if rf, ok := ret.Get(0).(func(*asyncgo.Options) asyncgo.WorkerPool); ok {
+	if rf, ok := ret.Get(0).(func(*commons.Options) asyncgo.WorkerPool); ok {
 		r0 = rf(options)
 	} else {
 		if ret.Get(0) != nil {

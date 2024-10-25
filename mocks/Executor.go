@@ -4,6 +4,7 @@ package mocks
 
 import (
 	context "context"
+	"github.com/abhi16180/asyncgo/commons"
 
 	asyncgo "github.com/abhi16180/asyncgo"
 
@@ -16,7 +17,7 @@ type Executor struct {
 }
 
 // NewFixedWorkerPool provides a mock function with given fields: ctx, options
-func (_m *Executor) NewFixedWorkerPool(ctx context.Context, options *asyncgo.Options) asyncgo.WorkerPool {
+func (_m *Executor) NewFixedWorkerPool(ctx context.Context, options *commons.Options) asyncgo.WorkerPool {
 	ret := _m.Called(ctx, options)
 
 	if len(ret) == 0 {
@@ -24,7 +25,7 @@ func (_m *Executor) NewFixedWorkerPool(ctx context.Context, options *asyncgo.Opt
 	}
 
 	var r0 asyncgo.WorkerPool
-	if rf, ok := ret.Get(0).(func(context.Context, *asyncgo.Options) asyncgo.WorkerPool); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *commons.Options) asyncgo.WorkerPool); ok {
 		r0 = rf(ctx, options)
 	} else {
 		if ret.Get(0) != nil {
