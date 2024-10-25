@@ -15,7 +15,6 @@ func main() {
 		WorkerCount: 50,
 		BufferSize:  10,
 	})
-
 	var futures []*asyncgo.Future
 
 	for i := 0; i < 100; i++ {

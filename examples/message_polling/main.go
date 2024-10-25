@@ -21,7 +21,7 @@ func main() {
 	// call this method to close workers gracefully
 	defer workerPool.Shutdown()
 
-	ctx, _ := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 
 	for i := 0; i < 10; i++ {
 		_, err := workerPool.Submit(receiveMessage, ctx)
@@ -30,7 +30,7 @@ func main() {
 		}
 	}
 
-	// stopAfterSometime() is needed to stop polling after given duration
+	stopAfterSometime(cancel) // is needed to stop polling after given duration
 	// needs to be commented if infinite polling is needed
 
 	// WaitAll waits until all futures are done executing
