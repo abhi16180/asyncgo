@@ -3,6 +3,8 @@ package asyncgo
 import (
 	"context"
 	"fmt"
+	"github.com/abhi16180/asyncgo/commons"
+	"github.com/abhi16180/asyncgo/internal"
 	"log"
 	"sync"
 	"time"
@@ -30,16 +32,16 @@ type WorkerPool interface {
 }
 
 type WorkerPoolService struct {
-	options   *Options
-	taskChan  *chan Task
+	options   *commons.Options
+	taskChan  *chan internal.Task
 	shutDown  *chan interface{}
 	futures   *[]Future
 	wg        *sync.WaitGroup
 	Cancel    context.CancelFunc
-	taskQueue TaskQueue
+	taskQueue internal.TaskQueue
 }
 
-func NewWorkerPool(taskQueue TaskQueue, taskChan *chan Task, wg *sync.WaitGroup, cancel context.CancelFunc, shutDown *chan interface{}) WorkerPool {
+func NewWorkerPool(taskQueue internal.TaskQueue, taskChan *chan internal.Task, wg *sync.WaitGroup, cancel context.CancelFunc, shutDown *chan interface{}) WorkerPool {
 	return &WorkerPoolService{
 		taskChan:  taskChan,
 		wg:        wg,
@@ -53,7 +55,7 @@ func NewWorkerPool(taskQueue TaskQueue, taskChan *chan Task, wg *sync.WaitGroup,
 func (w *WorkerPoolService) Submit(function interface{}, args ...interface{}) (*Future, error) {
 	resultChan := make(chan []interface{})
 	errChan := make(chan error)
-	task := NewTask(resultChan, errChan, function, args)
+	task := internal.NewTask(resultChan, errChan, function, args)
 	err := w.taskQueue.Push(&task)
 	if err != nil {
 		return nil, err
@@ -98,7 +100,7 @@ type WorkerService struct {
 }
 
 // worker creates a new worker which processes tasks from tasks channel
-func worker(ctx context.Context, wg *sync.WaitGroup, tasks <-chan Task, id int64) {
+func worker(ctx context.Context, wg *sync.WaitGroup, tasks <-chan internal.Task, id int64) {
 	log.Printf("worker %v started", id)
 	defer wg.Done()
 	for {

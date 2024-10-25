@@ -3,6 +3,7 @@ package asyncgo
 import (
 	"context"
 	"fmt"
+	"github.com/abhi16180/asyncgo/commons"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -70,7 +71,7 @@ func TestExecutorServiceImpl_Submit(t *testing.T) {
 
 func TestExecutorServiceImpl_NewFixedWorkerPool(t *testing.T) {
 	type args struct {
-		options *Options
+		options *commons.Options
 	}
 	tests := []struct {
 		name string
@@ -79,7 +80,7 @@ func TestExecutorServiceImpl_NewFixedWorkerPool(t *testing.T) {
 		{
 			name: "success",
 			args: args{
-				options: &Options{
+				options: &commons.Options{
 					WorkerCount: 2,
 					BufferSize:  10,
 				},
@@ -98,7 +99,7 @@ func TestExecutorServiceImpl_NewFixedWorkerPool(t *testing.T) {
 
 func TestWorkerPool1(t *testing.T) {
 	executorService := NewExecutor()
-	workerPool := executorService.NewFixedWorkerPool(context.TODO(), &Options{
+	workerPool := executorService.NewFixedWorkerPool(context.TODO(), &commons.Options{
 		WorkerCount: 100,
 		BufferSize:  100,
 	})
@@ -127,7 +128,7 @@ func TestWorkerPool1(t *testing.T) {
 
 func TestWorkerPoolEnsureGracefulShutdown(t *testing.T) {
 	executorService := NewExecutor()
-	workerPool := executorService.NewFixedWorkerPool(context.TODO(), &Options{
+	workerPool := executorService.NewFixedWorkerPool(context.TODO(), &commons.Options{
 		WorkerCount: 100,
 		BufferSize:  100,
 	})

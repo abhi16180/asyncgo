@@ -3,6 +3,8 @@ package asyncgo
 import (
 	"context"
 	"fmt"
+	"github.com/abhi16180/asyncgo/commons"
+	"github.com/abhi16180/asyncgo/internal"
 	"log"
 	"runtime"
 	"sync"
@@ -22,22 +24,16 @@ type Executor interface {
 	// NewFixedWorkerPool creates pool of workers with given options. Spawns separate go-routine for queue processor
 	// *Note* - If you are not sure about bufferSize, do not set it explicitly.
 	// Default bufferSize will be set to BufferedChannelSize
-	NewFixedWorkerPool(ctx context.Context, options *Options) WorkerPool
+	NewFixedWorkerPool(ctx context.Context, options *commons.Options) WorkerPool
 	// pushToQueue adds task to task queue associated with the worker pool
 }
 
-type Options struct {
-	// WorkerCount - number of goroutines
-	WorkerCount int64
-	// BufferSize is size of buffered channel
-	BufferSize int64
-	// IdleSleepDuration is needed to specify sleep duration if not new tasks is added to queue.
-	// It is required to prevent unnecessary wasting of CPU cycles.
-	// Default value will be set as 10ms
-	IdleSleepDuration time.Duration
+type ExecutorService struct {
 }
 
-type ExecutorService struct {
+// NewExecutor Creates new executorService
+func NewExecutor() Executor {
+	return &ExecutorService{}
 }
 
 func (e *ExecutorService) Submit(function interface{}, args ...interface{}) *Future {
@@ -45,7 +41,7 @@ func (e *ExecutorService) Submit(function interface{}, args ...interface{}) *Fut
 	defer mutex.Unlock()
 	resultChan := make(chan []interface{})
 	errChan := make(chan error)
-	task := NewTask(resultChan, errChan, function, args)
+	task := internal.NewTask(resultChan, errChan, function, args)
 	go func() {
 		err := task.Execute()
 		if err != nil {
@@ -55,16 +51,16 @@ func (e *ExecutorService) Submit(function interface{}, args ...interface{}) *Fut
 	return NewFuture(resultChan, errChan)
 }
 
-func (e *ExecutorService) NewFixedWorkerPool(ctx context.Context, options *Options) WorkerPool {
+func (e *ExecutorService) NewFixedWorkerPool(ctx context.Context, options *commons.Options) WorkerPool {
 	mutex.Lock()
 	defer mutex.Unlock()
 	options = GetOrDefaultWorkerPoolOptions(options)
 	ctx, cancel := context.WithCancel(ctx)
-	taskChan := make(chan Task, options.BufferSize)
+	taskChan := make(chan internal.Task, options.BufferSize)
 	shutDown := make(chan interface{})
-	taskQueue := NewTaskQueue(&taskChan, &shutDown)
+	taskQueue := internal.NewTaskQueue(&taskChan, &shutDown)
 	wg.Add(1)
-	go taskQueue.Process(options)
+	go taskQueue.Process(&wg, options)
 	for i := int64(0); i < options.WorkerCount; i++ {
 		wg.Add(1)
 		go worker(ctx, &wg, taskChan, i)
@@ -72,12 +68,7 @@ func (e *ExecutorService) NewFixedWorkerPool(ctx context.Context, options *Optio
 	return NewWorkerPool(taskQueue, &taskChan, &wg, cancel, &shutDown)
 }
 
-// NewExecutor Creates new executorService
-func NewExecutor() Executor {
-	return &ExecutorService{}
-}
-
-func GetOrDefaultWorkerPoolOptions(inputOptions *Options) *Options {
+func GetOrDefaultWorkerPoolOptions(inputOptions *commons.Options) *commons.Options {
 	if inputOptions != nil {
 		if inputOptions.WorkerCount == 0 {
 			inputOptions.WorkerCount = int64(runtime.NumCPU())
@@ -90,8 +81,9 @@ func GetOrDefaultWorkerPoolOptions(inputOptions *Options) *Options {
 		}
 		return inputOptions
 	}
-	return &Options{
-		WorkerCount: int64(runtime.NumCPU()),
-		BufferSize:  BufferedChannelSize,
+	return &commons.Options{
+		WorkerCount:       int64(runtime.NumCPU()),
+		BufferSize:        BufferedChannelSize,
+		IdleSleepDuration: time.Millisecond * 10,
 	}
 }

@@ -1,12 +1,14 @@
-package asyncgo
+package internal
 
 import (
 	"errors"
+	"github.com/abhi16180/asyncgo/commons"
 	"log"
+	"sync"
 	"time"
 )
 
-//go:generate mockery --name=TaskQueue --output=./mocks --outpkg=mocks
+//go:generate mockery --name=TaskQueue --output=../mocks --outpkg=mocks
 type TaskQueue interface {
 	// Push pushes task to TaskQueue
 	Push(task *Task) error
@@ -16,8 +18,10 @@ type TaskQueue interface {
 	// Process continuously checks the buffered channel's size.
 	// If the buffered channel is not full, pops tasks from TaskQueue
 	// and sends to tasks channel
-	Process(options *Options)
+	Process(wg *sync.WaitGroup, options *commons.Options)
 }
+
+var mutex sync.Mutex
 
 type TaskQueueService struct {
 	size                   int
@@ -57,7 +61,7 @@ func (t *TaskQueueService) Pop() *Task {
 	return nil
 }
 
-func (t *TaskQueueService) Process(options *Options) {
+func (t *TaskQueueService) Process(wg *sync.WaitGroup, options *commons.Options) {
 	defer wg.Done()
 	for {
 		select {

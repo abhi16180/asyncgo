@@ -25,5 +25,3 @@ func (f *Future) Wait() error {
 	_, err := f.Get()
 	return err
 }
-
-// wait all futures

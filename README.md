@@ -45,7 +45,7 @@ implementations for executing tasks.
 
    executorService := asyncgo.NewExecutorService()
    // set worker count and buffer size based on your needs
-   workerPool := executorService.NewFixedWorkerPool(&asyncgo.Options{
+   workerPool := executorService.NewFixedWorkerPool(&commons.Options{
        WorkerCount: 10,
        BufferSize:  20,
    })
@@ -80,7 +80,7 @@ implementations for executing tasks.
        now := time.Now()
        executorService := asyncgo.NewExecutorService()
        // set worker count and buffer size based on your needs
-       workerPool := executorService.NewFixedWorkerPool(&asyncgo.Options{
+       workerPool := executorService.NewFixedWorkerPool(&commons.Options{
            WorkerCount: 10,
            BufferSize:  20,
        })

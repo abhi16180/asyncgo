@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/abhi16180/asyncgo"
+	"github.com/abhi16180/asyncgo/commons"
 	"log"
 	"math/rand"
 	"time"
@@ -12,7 +13,7 @@ func main() {
 	executor := asyncgo.NewExecutor()
 
 	// set worker count and buffer size according to your needs
-	workerPool := executor.NewFixedWorkerPool(context.TODO(), &asyncgo.Options{
+	workerPool := executor.NewFixedWorkerPool(context.TODO(), &commons.Options{
 		WorkerCount: 10,
 		BufferSize:  10,
 	})

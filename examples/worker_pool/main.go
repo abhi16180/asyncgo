@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/abhi16180/asyncgo"
+	"github.com/abhi16180/asyncgo/commons"
 	"log"
 	"time"
 )
@@ -10,7 +11,7 @@ import (
 func main() {
 	now := time.Now()
 	exe := asyncgo.NewExecutor()
-	workerPool := exe.NewFixedWorkerPool(context.Background(), &asyncgo.Options{
+	workerPool := exe.NewFixedWorkerPool(context.Background(), &commons.Options{
 		WorkerCount: 50,
 		BufferSize:  10,
 	})
