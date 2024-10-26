@@ -1,7 +1,7 @@
 # asyncgo
 
 <img src="doc_assets/asyncgo.png" width="180" height="180" alt="asyncgo logo"><br>
-[![Go Reference](https://pkg.go.dev/badge/github.com/abhi16180/asyncgo.svg)](https://pkg.go.dev/github.com/abhi16180/asyncgo)
+[![Go Reference](https://pkg.go.dev/badge/github.com/abhi16180/asyncgo.svg)](https://pkg.go.dev/github.com/abhi16180/asyncgo) <br>
 Asyncgo is zero-dependency asynchronous task executor written in pure go, that prioritises speed and ease of use.
 
 ###  Features
@@ -15,7 +15,7 @@ Asyncgo is zero-dependency asynchronous task executor written in pure go, that p
 
 - Asynchronous HTTP Requests for Microservices
 - Background Job Execution
-- Infinite concurrent pollling with worker pool (receiving messages from AWS SQS or similar services)
+- Infinite concurrent polling with worker pool (receiving messages from AWS SQS or similar services)
 
 
 ### Documentation
