@@ -27,9 +27,9 @@ jobs:
       run: go test -v ./...
       
     - name: clean nightly
-    - env:
+      env:
         GH_TOKEN: ${{ github.token }}
-    - run: gh release delete nightly --yes || true
+      run: gh release delete nightly --yes || true
     
     - name: nightly
       env:
