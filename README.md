@@ -1,5 +1,5 @@
 # asyncgo
-<img src="doc_assets/asyncgo.png" width="100" height="100"><br>
+<img src="doc_assets/asyncgo.png" width="180" height="180" alt="asyncgo logo"><br>
 Asyncgo is zero-dependency asynchronous task executor written in pure go, that prioritises speed and ease of use.
 
 ###  Features
