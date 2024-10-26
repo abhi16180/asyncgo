@@ -29,4 +29,5 @@ jobs:
     - name: nightly
       env:
         GH_TOKEN: ${{ github.token }}
-      run: gh release create nightly --title "Nightly Build" --notes "This is development build" --prerelease
+      run: gh release delete nightly --yes || true
+           gh release create nightly --title "Nightly Build" --notes "This is development build" --prerelease
