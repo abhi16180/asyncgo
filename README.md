@@ -18,11 +18,23 @@ Asyncgo is zero-dependency asynchronous task executor written in pure go, that p
 
 ### Documentation
 
+1. Installation
+    ```
+    go get github.com/abhi16180/asyncgo"
+    ```
+2. Importing
+   ```
+   import "github.com/abhi16180/asyncgo"
+   ```
+
+### Examples 
+
 1. Executing multiple functions asynchronously 
 
 ```go
 
     package main
+
     import (
         "github.com/abhi16180/asyncgo"
         "log"
@@ -76,6 +88,9 @@ func main() {
 		WorkerCount: 100,
 		BufferSize:  100,
 	})
+        // gracefully terminate all workers
+	// guarantees every task is executed
+	defer workerPool.Shutdown()
 	futures := []*asyncgo.Future{}
 	for i := 0; i < 1000; i++ {
 		future, err := workerPool.Submit(timeConsumingTask)
@@ -102,3 +117,45 @@ func timeConsumingTask() string {
 }
 
 ```
+4. Cancelling worker pool in the middle of execution
+```go
+
+package main
+
+import (
+	"context"
+	"github.com/abhi16180/asyncgo"
+	"github.com/abhi16180/asyncgo/commons"
+	"log"
+	"time"
+)
+
+func main() {
+	executor := asyncgo.NewExecutor()
+	workerPool := executor.NewFixedWorkerPool(context.Background(), &commons.Options{
+		WorkerCount: 100,
+		BufferSize:  100,
+	})
+
+	futures := []*asyncgo.Future{}
+	for i := 0; i < 1000; i++ {
+		future, err := workerPool.Submit(timeConsumingTask)
+		if err != nil {
+			log.Println("error while submitting task to worker pool")
+			continue
+		}
+		futures = append(futures, future)
+	}
+	// terminate worker pool in the middle of task(s) execution
+	workerPool.Terminate()
+}
+
+func timeConsumingTask() string {
+	time.Sleep(2 * time.Second)
+	return "success"
+}
+
+```
+
+
+4. For more use-cases and complex examples check out <a href="https://github.com/abhi16180/asyncgo/tree/main/examples">examples</a> section
