@@ -20,7 +20,7 @@ Asyncgo is zero-dependency asynchronous task executor written in pure go, that p
 
 1. Installation
     ```
-    go get github.com/abhi16180/asyncgo"
+    go get github.com/abhi16180/asyncgo
     ```
 2. Importing
    ```go
