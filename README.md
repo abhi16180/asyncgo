@@ -119,7 +119,7 @@ func timeConsumingTask() string {
 }
 
 ```
-4. Cancelling worker pool in the middle of execution
+3. Cancelling worker pool in the middle of execution
 ```go
 
 package main
