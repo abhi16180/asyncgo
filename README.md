@@ -1,5 +1,5 @@
 # asyncgo
-
+<img src="doc_assets/asyncgo.png" width="100" height="100"><br>
 Asyncgo is zero-dependency asynchronous task executor written in pure go, that prioritises speed and ease of use.
 
 ###  Features
@@ -68,6 +68,8 @@ Asyncgo is zero-dependency asynchronous task executor written in pure go, that p
         log.Println(result1, result2)
     }
 ```
+#### NOTE: 
+```executor.Submit(function,args..)``` always swpans new goroutine every time. For large number of tasks, its recommended to use worker pool
 
 2. Executing large number of tasks with fixed sized worker pool
 ```go
