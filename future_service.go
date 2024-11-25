@@ -1,6 +1,8 @@
 package asyncgo
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Future struct {
 	resultChan     <-chan []interface{}
@@ -29,7 +31,7 @@ func (f *Future) Get() ([]interface{}, error) {
 }
 
 func (f *Future) Wait() error {
-	if !f.isRead {
+	if f.isRead {
 		return fmt.Errorf("asyncgo.Future: wait already read")
 	}
 	_, err := f.Get()

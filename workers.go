@@ -35,7 +35,7 @@ type WorkerPoolService struct {
 	options   *commons.Options
 	taskChan  *chan internal.Task
 	shutDown  *chan interface{}
-	futures   *[]Future
+	futures   []*Future
 	wg        *sync.WaitGroup
 	Cancel    context.CancelFunc
 	taskQueue internal.Queue
@@ -48,7 +48,7 @@ func NewWorkerPool(taskQueue internal.Queue, taskChan *chan internal.Task, wg *s
 		Cancel:    cancel,
 		taskQueue: taskQueue,
 		shutDown:  shutDown,
-		futures:   &[]Future{},
+		futures:   []*Future{},
 	}
 }
 
@@ -61,7 +61,7 @@ func (w *WorkerPoolService) Submit(function interface{}, args ...interface{}) (*
 		return nil, err
 	}
 	f := NewFuture(resultChan, errChan)
-	*w.futures = append(*w.futures, *f)
+	w.futures = append(w.futures, f)
 	return f, nil
 }
 
@@ -83,8 +83,8 @@ func (w *WorkerPoolService) Terminate() {
 }
 
 func (w *WorkerPoolService) WaitAll() error {
-	for _, future := range *w.futures {
-		err := future.Wait()
+	for i := 0; i < len(w.futures); i++ {
+		err := w.futures[i].Wait()
 		if err != nil {
 			log.Println(err)
 			return err
