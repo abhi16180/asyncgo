@@ -8,7 +8,7 @@ type Future struct {
 	result         []interface{}
 	err            error
 	executionError error
-	alreadyRead    bool
+	isRead         bool
 }
 
 func NewFuture(resultChannel <-chan []interface{}, errChan chan error) *Future {
@@ -19,14 +19,17 @@ func NewFuture(resultChannel <-chan []interface{}, errChan chan error) *Future {
 }
 
 func (f *Future) Get() ([]interface{}, error) {
+	if f.isRead {
+		return f.result, f.executionError
+	}
 	f.result = <-f.resultChan
 	f.err = <-f.errChan
-	f.alreadyRead = true
+	f.isRead = true
 	return f.result, f.err
 }
 
 func (f *Future) Wait() error {
-	if !f.alreadyRead {
+	if !f.isRead {
 		return fmt.Errorf("asyncgo.Future: wait already read")
 	}
 	_, err := f.Get()
