@@ -75,6 +75,7 @@ func (w *WorkerPoolService) ChannelBufferSize() int64 {
 
 func (w *WorkerPoolService) Shutdown() {
 	*w.shutDown <- true
+	_ = w.WaitAll()
 }
 
 func (w *WorkerPoolService) Terminate() {

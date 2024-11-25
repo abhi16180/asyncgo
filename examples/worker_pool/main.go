@@ -15,6 +15,8 @@ func main() {
 		WorkerCount: 50,
 		BufferSize:  10,
 	})
+	defer workerPool.Shutdown()
+
 	var futures []*asyncgo.Future
 
 	for i := 0; i < 100; i++ {
@@ -26,16 +28,15 @@ func main() {
 		}
 		futures = append(futures, future)
 	}
+
 	for _, future := range futures {
 		result, err := future.Get()
 		if err != nil {
 			log.Println("error while executing the function", err)
 			continue
 		}
-		log.Println("result", result)
+		log.Println("result->", result)
 	}
-	// gracefully shutdown all the workers
-	workerPool.Shutdown()
 	log.Printf("total time taken %v", time.Since(now))
 }
 
