@@ -3,18 +3,16 @@ package asyncgo
 import (
 	"context"
 	"fmt"
-	"github.com/abhi16180/asyncgo/commons"
-	"github.com/abhi16180/asyncgo/internal"
 	"log"
 	"runtime"
 	"sync"
 	"time"
+
+	"github.com/abhi16180/asyncgo/commons"
+	"github.com/abhi16180/asyncgo/internal"
 )
 
 const BufferedChannelSize int64 = 20
-
-var wg sync.WaitGroup
-var mutex sync.Mutex
 
 //go:generate mockery --name=Executor --output=./mocks --outpkg=mocks
 type Executor interface {
@@ -29,6 +27,8 @@ type Executor interface {
 }
 
 type ExecutorService struct {
+	wg    sync.WaitGroup
+	mutex sync.Mutex
 }
 
 // NewExecutor Creates new executorService
@@ -37,8 +37,8 @@ func NewExecutor() Executor {
 }
 
 func (e *ExecutorService) Submit(function interface{}, args ...interface{}) *Future {
-	mutex.Lock()
-	defer mutex.Unlock()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	resultChan := make(chan []interface{})
 	errChan := make(chan error)
 	task := internal.NewTask(resultChan, errChan, function, args)
@@ -52,20 +52,20 @@ func (e *ExecutorService) Submit(function interface{}, args ...interface{}) *Fut
 }
 
 func (e *ExecutorService) NewFixedWorkerPool(ctx context.Context, options *commons.Options) WorkerPool {
-	mutex.Lock()
-	defer mutex.Unlock()
+	e.mutex.Lock()
+	defer e.mutex.Unlock()
 	options = GetOrDefaultWorkerPoolOptions(options)
 	ctx, cancel := context.WithCancel(ctx)
 	taskChan := make(chan internal.Task, options.BufferSize)
 	shutDown := make(chan interface{})
 	taskQueue := internal.NewTaskQueue(&taskChan, &shutDown)
-	wg.Add(1)
-	go taskQueue.Process(&wg, options)
+	e.wg.Add(1)
+	go taskQueue.Process(&e.wg, options)
 	for i := int64(0); i < options.WorkerCount; i++ {
-		wg.Add(1)
-		go worker(ctx, &wg, taskChan, i)
+		e.wg.Add(1)
+		go worker(ctx, &e.wg, taskChan, i)
 	}
-	return NewWorkerPool(taskQueue, &taskChan, &wg, cancel, &shutDown)
+	return NewWorkerPool(taskQueue, &taskChan, &e.wg, cancel, &shutDown)
 }
 
 func GetOrDefaultWorkerPoolOptions(inputOptions *commons.Options) *commons.Options {
